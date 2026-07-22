@@ -381,6 +381,8 @@ func TestAPIContracts(t *testing.T) {
 						"fallback_group_id_on_invalid_request": null,
 						"require_oauth_only": false,
 						"require_privacy_set": false,
+						"max_reasoning_effort": "",
+						"reasoning_effort_mappings": null,
 						"rpm_limit": 0,
 						"kiro_auto_sticky_enabled": false,
 						"kiro_sticky_session_ttl_seconds": 0,

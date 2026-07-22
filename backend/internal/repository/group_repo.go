@@ -102,6 +102,8 @@ func createGroupRecord(ctx context.Context, client *dbent.Client, groupIn *servi
 		SetKiroStickySessionTTLSeconds(groupIn.KiroStickySessionTTLSeconds).
 		SetKiroCacheEmulationRatio(groupIn.KiroCacheEmulationRatio).
 		SetKiroEndpointMode(groupIn.KiroEndpointMode).
+		SetMaxReasoningEffort(groupIn.MaxReasoningEffort).
+		SetReasoningEffortMappings(groupIn.ReasoningEffortMappings).
 		SetPeakRateEnabled(groupIn.PeakRateEnabled).
 		SetPeakStart(groupIn.PeakStart).
 		SetPeakEnd(groupIn.PeakEnd).
@@ -271,6 +273,8 @@ func (r *groupRepository) Update(ctx context.Context, groupIn *service.Group) er
 		SetKiroStickySessionTTLSeconds(groupIn.KiroStickySessionTTLSeconds).
 		SetKiroCacheEmulationRatio(groupIn.KiroCacheEmulationRatio).
 		SetKiroEndpointMode(groupIn.KiroEndpointMode).
+		SetMaxReasoningEffort(groupIn.MaxReasoningEffort).
+		SetReasoningEffortMappings(groupIn.ReasoningEffortMappings).
 		SetPeakRateEnabled(groupIn.PeakRateEnabled).
 		SetPeakStart(groupIn.PeakStart).
 		SetPeakEnd(groupIn.PeakEnd).

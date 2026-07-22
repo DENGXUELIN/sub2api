@@ -887,6 +887,8 @@ var (
 		{Name: "kiro_sticky_session_ttl_seconds", Type: field.TypeInt, Default: 3600},
 		{Name: "kiro_cache_emulation_ratio", Type: field.TypeFloat64, Default: 1, SchemaType: map[string]string{"postgres": "decimal(5,4)"}},
 		{Name: "kiro_endpoint_mode", Type: field.TypeString, Size: 8, Default: "q"},
+		{Name: "max_reasoning_effort", Type: field.TypeString, Size: 20, Default: ""},
+		{Name: "reasoning_effort_mappings", Type: field.TypeJSON, SchemaType: map[string]string{"postgres": "jsonb"}},
 	}
 	// GroupsTable holds the schema information for the "groups" table.
 	GroupsTable = &schema.Table{

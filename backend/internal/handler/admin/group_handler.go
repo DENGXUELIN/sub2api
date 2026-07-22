@@ -138,6 +138,11 @@ type CreateGroupRequest struct {
 	KiroStickySessionTTLSeconds *int     `json:"kiro_sticky_session_ttl_seconds"`
 	KiroCacheEmulationRatio     *float64 `json:"kiro_cache_emulation_ratio"`
 	KiroEndpointMode            *string  `json:"kiro_endpoint_mode"`
+
+	// OpenAI/Codex 请求推理强度上限，空字符串表示不限制。
+	MaxReasoningEffort string `json:"max_reasoning_effort"`
+	// OpenAI/Codex 推理强度精确映射。
+	ReasoningEffortMappings []service.ReasoningEffortMapping `json:"reasoning_effort_mappings"`
 	// 从指定分组复制账号（创建后自动绑定）
 	CopyAccountsFromGroupIDs []int64 `json:"copy_accounts_from_group_ids"`
 }
@@ -198,6 +203,11 @@ type UpdateGroupRequest struct {
 	KiroStickySessionTTLSeconds *int     `json:"kiro_sticky_session_ttl_seconds"`
 	KiroCacheEmulationRatio     *float64 `json:"kiro_cache_emulation_ratio"`
 	KiroEndpointMode            *string  `json:"kiro_endpoint_mode"`
+
+	// OpenAI/Codex 请求推理强度上限；空字符串清除，nil 不修改。
+	MaxReasoningEffort *string `json:"max_reasoning_effort"`
+	// nil 不修改，空数组清空，非空数组替换。
+	ReasoningEffortMappings *[]service.ReasoningEffortMapping `json:"reasoning_effort_mappings"`
 	// 从指定分组复制账号（同步操作：先清空当前分组的账号绑定，再绑定源分组的账号）
 	CopyAccountsFromGroupIDs []int64 `json:"copy_accounts_from_group_ids"`
 }
@@ -389,6 +399,8 @@ func (h *GroupHandler) Create(c *gin.Context) {
 		KiroStickySessionTTLSeconds:     req.KiroStickySessionTTLSeconds,
 		KiroCacheEmulationRatio:         req.KiroCacheEmulationRatio,
 		KiroEndpointMode:                req.KiroEndpointMode,
+		MaxReasoningEffort:              req.MaxReasoningEffort,
+		ReasoningEffortMappings:         req.ReasoningEffortMappings,
 		CopyAccountsFromGroupIDs:        req.CopyAccountsFromGroupIDs,
 	})
 	if err != nil {
@@ -510,6 +522,8 @@ func (h *GroupHandler) Update(c *gin.Context) {
 		KiroStickySessionTTLSeconds:     req.KiroStickySessionTTLSeconds,
 		KiroCacheEmulationRatio:         req.KiroCacheEmulationRatio,
 		KiroEndpointMode:                req.KiroEndpointMode,
+		MaxReasoningEffort:              req.MaxReasoningEffort,
+		ReasoningEffortMappings:         req.ReasoningEffortMappings,
 		CopyAccountsFromGroupIDs:        req.CopyAccountsFromGroupIDs,
 	})
 	if err != nil {
