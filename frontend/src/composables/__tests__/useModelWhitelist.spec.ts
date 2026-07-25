@@ -105,6 +105,7 @@ describe('useModelWhitelist', () => {
 
     expect(models).toContain('claude-sonnet-4-6')
     expect(models).toContain('claude-sonnet-4-6-thinking')
+    expect(models).toContain('claude-opus-5')
     expect(models).toContain('claude-opus-4-8')
     expect(models).toContain('claude-opus-4-8-thinking')
     expect(models).not.toContain('claude-sonnet-4-6-chat')
@@ -115,6 +116,7 @@ describe('useModelWhitelist', () => {
     const models = getModelsByPlatform('kiro')
 
     expect(models).toEqual([
+      'claude-opus-5',
       'claude-opus-4-8',
       'claude-opus-4-8-thinking',
       'claude-opus-4-7',
@@ -194,6 +196,7 @@ describe('useModelWhitelist', () => {
     const mappingTargets = mappings.map(item => item.to)
 
     expect(mappings.map(({ from, to }) => ({ from, to }))).toEqual([
+      { from: 'claude-opus-5', to: 'claude-opus-5' },
       { from: 'claude-opus-4-8', to: 'claude-opus-4.8' },
       { from: 'claude-opus-4-8-thinking', to: 'claude-opus-4.8' },
       { from: 'claude-opus-4-7', to: 'claude-opus-4.7' },
@@ -236,6 +239,7 @@ describe('useModelWhitelist', () => {
     const mappings = await fetchKiroDefaultMappings()
 
     expect(mappings).toEqual(expect.arrayContaining([
+      { from: 'claude-opus-5', to: 'claude-opus-5' },
       { from: 'claude-opus-4-8', to: 'claude-opus-4.8' },
       { from: 'claude-opus-4-8-thinking', to: 'claude-opus-4.8' },
       { from: 'claude-opus-4-7', to: 'claude-opus-4.7' },
@@ -253,7 +257,7 @@ describe('useModelWhitelist', () => {
       { from: 'claude-haiku-4-5-20251001', to: 'claude-haiku-4.5' },
       { from: 'claude-haiku-4-5-20251001-thinking', to: 'claude-haiku-4.5' }
     ]))
-    expect(mappings).toHaveLength(16)
+    expect(mappings).toHaveLength(17)
     expect(mappings.every(item => !item.from.startsWith('kiro-'))).toBe(true)
     expect(mappings.every(item => !item.to.startsWith('kiro-'))).toBe(true)
     expect(mappings.every(item => !item.from.endsWith('-agentic'))).toBe(true)

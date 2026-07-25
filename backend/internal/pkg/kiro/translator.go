@@ -250,6 +250,8 @@ type kiroSemanticEvent struct {
 
 func MapModel(model string) string {
 	switch strings.TrimSpace(strings.ToLower(model)) {
+	case "claude-opus-5":
+		return "claude-opus-5"
 	case "claude-opus-4-8", "claude-opus-4-8-thinking", "claude-opus-4.8":
 		return "claude-opus-4.8"
 	case "claude-opus-4-7", "claude-opus-4-7-thinking", "claude-opus-4.7":
@@ -338,8 +340,9 @@ func normalizeModelAlias(model string) string {
 func kiroMaxOutputTokensForModel(model string) int {
 	normalized := normalizeModelAlias(model)
 	switch normalized {
-	// 仅 Opus 4.7 / 4.8 上限 128000（对齐 Kiro 官方规格）。
-	case "claude-opus-4-8", "claude-opus-4.8", "claude-opus-4-7", "claude-opus-4.7":
+	// Opus 5 官方规格为 128000 max output tokens；Opus 4.7/4.8 同为 128000。
+	case "claude-opus-5",
+		"claude-opus-4-8", "claude-opus-4.8", "claude-opus-4-7", "claude-opus-4.7":
 		return 128000
 	default:
 		// 其余 Kiro 模型（opus-4.6 / sonnet-5 / sonnet-4.6 / 各 4.5 及未知兜底）统一 64000。

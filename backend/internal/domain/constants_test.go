@@ -32,6 +32,7 @@ func TestDefaultKiroModelMapping_MatchesKiroReferenceModels(t *testing.T) {
 	t.Parallel()
 
 	expected := map[string]string{
+		"claude-opus-5":                       "claude-opus-5",
 		"claude-opus-4-8":                     "claude-opus-4.8",
 		"claude-opus-4-8-thinking":            "claude-opus-4.8",
 		"claude-opus-4-7":                     "claude-opus-4.7",
