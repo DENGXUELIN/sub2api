@@ -945,6 +945,7 @@ var (
 		{Name: "models_list_config", Type: field.TypeJSON, SchemaType: map[string]string{"postgres": "jsonb"}},
 		{Name: "rpm_limit", Type: field.TypeInt, Default: 0},
 		{Name: "kiro_cache_emulation_enabled", Type: field.TypeBool, Default: false},
+		{Name: "kiro_cache_force_creation_enabled", Type: field.TypeBool, Default: false},
 		{Name: "kiro_auto_sticky_enabled", Type: field.TypeBool, Default: true},
 		{Name: "kiro_sticky_session_ttl_seconds", Type: field.TypeInt, Default: 3600},
 		{Name: "kiro_cache_emulation_ratio", Type: field.TypeFloat64, Default: 1, SchemaType: map[string]string{"postgres": "decimal(5,4)"}},
@@ -1391,6 +1392,8 @@ var (
 		{Name: "role", Type: field.TypeString, Size: 20, Default: "system"},
 		{Name: "content", Type: field.TypeString, Size: 2147483647},
 		{Name: "action", Type: field.TypeString, Size: 10, Default: "prepend"},
+		{Name: "match_pattern", Type: field.TypeString, Nullable: true, Size: 2147483647},
+		{Name: "match_mode", Type: field.TypeString, Nullable: true, Size: 10, Default: "plain"},
 		{Name: "group_ids", Type: field.TypeJSON, Nullable: true, SchemaType: map[string]string{"postgres": "jsonb"}},
 		{Name: "model_ids", Type: field.TypeJSON, Nullable: true, SchemaType: map[string]string{"postgres": "jsonb"}},
 	}

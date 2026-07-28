@@ -226,6 +226,9 @@ func (Group) Fields() []ent.Field {
 		field.Bool("kiro_cache_emulation_enabled").
 			Default(false).
 			Comment("是否启用 Kiro 模拟缓存（仅 kiro 分组生效）"),
+		field.Bool("kiro_cache_force_creation_enabled").
+			Default(false).
+			Comment("是否在客户端未传 cache_control 时强制注入 Kiro 模拟缓存断点（仅 kiro 分组生效）"),
 		field.Bool("kiro_auto_sticky_enabled").
 			Default(true).
 			Comment("是否启用 Kiro 自动会话粘性路由（仅 kiro 分组生效）"),

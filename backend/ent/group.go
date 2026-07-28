@@ -119,6 +119,8 @@ type Group struct {
 	RpmLimit int `json:"rpm_limit,omitempty"`
 	// 是否启用 Kiro 模拟缓存（仅 kiro 分组生效）
 	KiroCacheEmulationEnabled bool `json:"kiro_cache_emulation_enabled,omitempty"`
+	// 是否在客户端未传 cache_control 时强制注入 Kiro 模拟缓存断点（仅 kiro 分组生效）
+	KiroCacheForceCreationEnabled bool `json:"kiro_cache_force_creation_enabled,omitempty"`
 	// 是否启用 Kiro 自动会话粘性路由（仅 kiro 分组生效）
 	KiroAutoStickyEnabled bool `json:"kiro_auto_sticky_enabled,omitempty"`
 	// Kiro 自动会话粘性绑定 TTL（秒，仅 kiro 分组生效）
@@ -239,7 +241,7 @@ func (*Group) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case group.FieldModelRouting, group.FieldSupportedModelScopes, group.FieldMessagesDispatchModelConfig, group.FieldModelsListConfig, group.FieldReasoningEffortMappings:
 			values[i] = new([]byte)
-		case group.FieldPeakRateEnabled, group.FieldIsExclusive, group.FieldAllowImageGeneration, group.FieldAllowBatchImageGeneration, group.FieldImageRateIndependent, group.FieldVideoRateIndependent, group.FieldClaudeCodeOnly, group.FieldModelRoutingEnabled, group.FieldMcpXMLInject, group.FieldAllowMessagesDispatch, group.FieldRequireOauthOnly, group.FieldRequirePrivacySet, group.FieldKiroCacheEmulationEnabled, group.FieldKiroAutoStickyEnabled:
+		case group.FieldPeakRateEnabled, group.FieldIsExclusive, group.FieldAllowImageGeneration, group.FieldAllowBatchImageGeneration, group.FieldImageRateIndependent, group.FieldVideoRateIndependent, group.FieldClaudeCodeOnly, group.FieldModelRoutingEnabled, group.FieldMcpXMLInject, group.FieldAllowMessagesDispatch, group.FieldRequireOauthOnly, group.FieldRequirePrivacySet, group.FieldKiroCacheEmulationEnabled, group.FieldKiroCacheForceCreationEnabled, group.FieldKiroAutoStickyEnabled:
 			values[i] = new(sql.NullBool)
 		case group.FieldRateMultiplier, group.FieldPeakRateMultiplier, group.FieldDailyLimitUsd, group.FieldWeeklyLimitUsd, group.FieldMonthlyLimitUsd, group.FieldImageRateMultiplier, group.FieldImagePrice1k, group.FieldImagePrice2k, group.FieldImagePrice4k, group.FieldBatchImageDiscountMultiplier, group.FieldBatchImageHoldMultiplier, group.FieldVideoRateMultiplier, group.FieldVideoPrice480p, group.FieldVideoPrice720p, group.FieldVideoPrice1080p, group.FieldWebSearchPricePerCall, group.FieldKiroCacheEmulationRatio:
 			values[i] = new(sql.NullFloat64)
@@ -593,6 +595,12 @@ func (_m *Group) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				_m.KiroCacheEmulationEnabled = value.Bool
 			}
+		case group.FieldKiroCacheForceCreationEnabled:
+			if value, ok := values[i].(*sql.NullBool); !ok {
+				return fmt.Errorf("unexpected type %T for field kiro_cache_force_creation_enabled", values[i])
+			} else if value.Valid {
+				_m.KiroCacheForceCreationEnabled = value.Bool
+			}
 		case group.FieldKiroAutoStickyEnabled:
 			if value, ok := values[i].(*sql.NullBool); !ok {
 				return fmt.Errorf("unexpected type %T for field kiro_auto_sticky_enabled", values[i])
@@ -886,6 +894,9 @@ func (_m *Group) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("kiro_cache_emulation_enabled=")
 	builder.WriteString(fmt.Sprintf("%v", _m.KiroCacheEmulationEnabled))
+	builder.WriteString(", ")
+	builder.WriteString("kiro_cache_force_creation_enabled=")
+	builder.WriteString(fmt.Sprintf("%v", _m.KiroCacheForceCreationEnabled))
 	builder.WriteString(", ")
 	builder.WriteString("kiro_auto_sticky_enabled=")
 	builder.WriteString(fmt.Sprintf("%v", _m.KiroAutoStickyEnabled))

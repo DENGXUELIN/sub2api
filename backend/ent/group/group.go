@@ -116,6 +116,8 @@ const (
 	FieldRpmLimit = "rpm_limit"
 	// FieldKiroCacheEmulationEnabled holds the string denoting the kiro_cache_emulation_enabled field in the database.
 	FieldKiroCacheEmulationEnabled = "kiro_cache_emulation_enabled"
+	// FieldKiroCacheForceCreationEnabled holds the string denoting the kiro_cache_force_creation_enabled field in the database.
+	FieldKiroCacheForceCreationEnabled = "kiro_cache_force_creation_enabled"
 	// FieldKiroAutoStickyEnabled holds the string denoting the kiro_auto_sticky_enabled field in the database.
 	FieldKiroAutoStickyEnabled = "kiro_auto_sticky_enabled"
 	// FieldKiroStickySessionTTLSeconds holds the string denoting the kiro_sticky_session_ttl_seconds field in the database.
@@ -253,6 +255,7 @@ var Columns = []string{
 	FieldModelsListConfig,
 	FieldRpmLimit,
 	FieldKiroCacheEmulationEnabled,
+	FieldKiroCacheForceCreationEnabled,
 	FieldKiroAutoStickyEnabled,
 	FieldKiroStickySessionTTLSeconds,
 	FieldKiroCacheEmulationRatio,
@@ -372,6 +375,8 @@ var (
 	DefaultRpmLimit int
 	// DefaultKiroCacheEmulationEnabled holds the default value on creation for the "kiro_cache_emulation_enabled" field.
 	DefaultKiroCacheEmulationEnabled bool
+	// DefaultKiroCacheForceCreationEnabled holds the default value on creation for the "kiro_cache_force_creation_enabled" field.
+	DefaultKiroCacheForceCreationEnabled bool
 	// DefaultKiroAutoStickyEnabled holds the default value on creation for the "kiro_auto_sticky_enabled" field.
 	DefaultKiroAutoStickyEnabled bool
 	// DefaultKiroStickySessionTTLSeconds holds the default value on creation for the "kiro_sticky_session_ttl_seconds" field.
@@ -626,6 +631,11 @@ func ByRpmLimit(opts ...sql.OrderTermOption) OrderOption {
 // ByKiroCacheEmulationEnabled orders the results by the kiro_cache_emulation_enabled field.
 func ByKiroCacheEmulationEnabled(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldKiroCacheEmulationEnabled, opts...).ToFunc()
+}
+
+// ByKiroCacheForceCreationEnabled orders the results by the kiro_cache_force_creation_enabled field.
+func ByKiroCacheForceCreationEnabled(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldKiroCacheForceCreationEnabled, opts...).ToFunc()
 }
 
 // ByKiroAutoStickyEnabled orders the results by the kiro_auto_sticky_enabled field.

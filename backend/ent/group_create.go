@@ -705,6 +705,20 @@ func (_c *GroupCreate) SetNillableKiroCacheEmulationEnabled(v *bool) *GroupCreat
 	return _c
 }
 
+// SetKiroCacheForceCreationEnabled sets the "kiro_cache_force_creation_enabled" field.
+func (_c *GroupCreate) SetKiroCacheForceCreationEnabled(v bool) *GroupCreate {
+	_c.mutation.SetKiroCacheForceCreationEnabled(v)
+	return _c
+}
+
+// SetNillableKiroCacheForceCreationEnabled sets the "kiro_cache_force_creation_enabled" field if the given value is not nil.
+func (_c *GroupCreate) SetNillableKiroCacheForceCreationEnabled(v *bool) *GroupCreate {
+	if v != nil {
+		_c.SetKiroCacheForceCreationEnabled(*v)
+	}
+	return _c
+}
+
 // SetKiroAutoStickyEnabled sets the "kiro_auto_sticky_enabled" field.
 func (_c *GroupCreate) SetKiroAutoStickyEnabled(v bool) *GroupCreate {
 	_c.mutation.SetKiroAutoStickyEnabled(v)
@@ -1046,6 +1060,10 @@ func (_c *GroupCreate) defaults() error {
 		v := group.DefaultKiroCacheEmulationEnabled
 		_c.mutation.SetKiroCacheEmulationEnabled(v)
 	}
+	if _, ok := _c.mutation.KiroCacheForceCreationEnabled(); !ok {
+		v := group.DefaultKiroCacheForceCreationEnabled
+		_c.mutation.SetKiroCacheForceCreationEnabled(v)
+	}
 	if _, ok := _c.mutation.KiroAutoStickyEnabled(); !ok {
 		v := group.DefaultKiroAutoStickyEnabled
 		_c.mutation.SetKiroAutoStickyEnabled(v)
@@ -1216,6 +1234,9 @@ func (_c *GroupCreate) check() error {
 	}
 	if _, ok := _c.mutation.KiroCacheEmulationEnabled(); !ok {
 		return &ValidationError{Name: "kiro_cache_emulation_enabled", err: errors.New(`ent: missing required field "Group.kiro_cache_emulation_enabled"`)}
+	}
+	if _, ok := _c.mutation.KiroCacheForceCreationEnabled(); !ok {
+		return &ValidationError{Name: "kiro_cache_force_creation_enabled", err: errors.New(`ent: missing required field "Group.kiro_cache_force_creation_enabled"`)}
 	}
 	if _, ok := _c.mutation.KiroAutoStickyEnabled(); !ok {
 		return &ValidationError{Name: "kiro_auto_sticky_enabled", err: errors.New(`ent: missing required field "Group.kiro_auto_sticky_enabled"`)}
@@ -1471,6 +1492,10 @@ func (_c *GroupCreate) createSpec() (*Group, *sqlgraph.CreateSpec) {
 	if value, ok := _c.mutation.KiroCacheEmulationEnabled(); ok {
 		_spec.SetField(group.FieldKiroCacheEmulationEnabled, field.TypeBool, value)
 		_node.KiroCacheEmulationEnabled = value
+	}
+	if value, ok := _c.mutation.KiroCacheForceCreationEnabled(); ok {
+		_spec.SetField(group.FieldKiroCacheForceCreationEnabled, field.TypeBool, value)
+		_node.KiroCacheForceCreationEnabled = value
 	}
 	if value, ok := _c.mutation.KiroAutoStickyEnabled(); ok {
 		_spec.SetField(group.FieldKiroAutoStickyEnabled, field.TypeBool, value)
@@ -2441,6 +2466,18 @@ func (u *GroupUpsert) SetKiroCacheEmulationEnabled(v bool) *GroupUpsert {
 // UpdateKiroCacheEmulationEnabled sets the "kiro_cache_emulation_enabled" field to the value that was provided on create.
 func (u *GroupUpsert) UpdateKiroCacheEmulationEnabled() *GroupUpsert {
 	u.SetExcluded(group.FieldKiroCacheEmulationEnabled)
+	return u
+}
+
+// SetKiroCacheForceCreationEnabled sets the "kiro_cache_force_creation_enabled" field.
+func (u *GroupUpsert) SetKiroCacheForceCreationEnabled(v bool) *GroupUpsert {
+	u.Set(group.FieldKiroCacheForceCreationEnabled, v)
+	return u
+}
+
+// UpdateKiroCacheForceCreationEnabled sets the "kiro_cache_force_creation_enabled" field to the value that was provided on create.
+func (u *GroupUpsert) UpdateKiroCacheForceCreationEnabled() *GroupUpsert {
+	u.SetExcluded(group.FieldKiroCacheForceCreationEnabled)
 	return u
 }
 
@@ -3497,6 +3534,20 @@ func (u *GroupUpsertOne) SetKiroCacheEmulationEnabled(v bool) *GroupUpsertOne {
 func (u *GroupUpsertOne) UpdateKiroCacheEmulationEnabled() *GroupUpsertOne {
 	return u.Update(func(s *GroupUpsert) {
 		s.UpdateKiroCacheEmulationEnabled()
+	})
+}
+
+// SetKiroCacheForceCreationEnabled sets the "kiro_cache_force_creation_enabled" field.
+func (u *GroupUpsertOne) SetKiroCacheForceCreationEnabled(v bool) *GroupUpsertOne {
+	return u.Update(func(s *GroupUpsert) {
+		s.SetKiroCacheForceCreationEnabled(v)
+	})
+}
+
+// UpdateKiroCacheForceCreationEnabled sets the "kiro_cache_force_creation_enabled" field to the value that was provided on create.
+func (u *GroupUpsertOne) UpdateKiroCacheForceCreationEnabled() *GroupUpsertOne {
+	return u.Update(func(s *GroupUpsert) {
+		s.UpdateKiroCacheForceCreationEnabled()
 	})
 }
 
@@ -4733,6 +4784,20 @@ func (u *GroupUpsertBulk) SetKiroCacheEmulationEnabled(v bool) *GroupUpsertBulk 
 func (u *GroupUpsertBulk) UpdateKiroCacheEmulationEnabled() *GroupUpsertBulk {
 	return u.Update(func(s *GroupUpsert) {
 		s.UpdateKiroCacheEmulationEnabled()
+	})
+}
+
+// SetKiroCacheForceCreationEnabled sets the "kiro_cache_force_creation_enabled" field.
+func (u *GroupUpsertBulk) SetKiroCacheForceCreationEnabled(v bool) *GroupUpsertBulk {
+	return u.Update(func(s *GroupUpsert) {
+		s.SetKiroCacheForceCreationEnabled(v)
+	})
+}
+
+// UpdateKiroCacheForceCreationEnabled sets the "kiro_cache_force_creation_enabled" field to the value that was provided on create.
+func (u *GroupUpsertBulk) UpdateKiroCacheForceCreationEnabled() *GroupUpsertBulk {
+	return u.Update(func(s *GroupUpsert) {
+		s.UpdateKiroCacheForceCreationEnabled()
 	})
 }
 
