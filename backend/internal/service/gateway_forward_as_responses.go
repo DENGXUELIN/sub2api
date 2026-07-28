@@ -114,6 +114,7 @@ func (s *GatewayService) ForwardAsResponses(
 		if parsed != nil {
 			group = parsed.Group
 		}
+		anthropicBody = applyKiroForceCacheCreation(ctx, group, anthropicBody, mappedModel)
 		resp, _, err = s.openKiroAnthropicStreamResponse(ctx, account, parsed, anthropicBody, mappedModel, originalModel, c.Request.Header, group)
 		if err != nil {
 			safeErr := sanitizeUpstreamErrorMessage(err.Error())

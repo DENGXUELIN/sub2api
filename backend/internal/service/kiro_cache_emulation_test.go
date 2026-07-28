@@ -14,6 +14,7 @@ import (
 	"time"
 
 	"github.com/Wei-Shaw/sub2api/internal/pkg/anthropictokenizer"
+	"github.com/tidwall/gjson"
 )
 
 func TestKiroCacheEmulationGroupDefaultsAndNonKiro(t *testing.T) {
@@ -151,6 +152,110 @@ func TestKiroCacheEmulationPrefixPartialHit(t *testing.T) {
 	second := svc.buildKiroCacheEmulationUsage(context.Background(), account, group, secondBody, "claude-sonnet-4-6", 6000)
 	if second == nil || second.CacheReadInputTokens <= 0 || second.CacheReadInputTokens >= first.CacheCreationInputTokens || second.CacheCreationInputTokens <= 0 {
 		t.Fatalf("expected partial prefix hit: %+v", second)
+	}
+}
+
+func TestKiroForceCacheCreationAddsBreakpointAboveThreshold(t *testing.T) {
+	group := kiroCacheGroup(1)
+	group.KiroCacheForceCreationEnabled = true
+	body := kiroCacheRequestBodyWithoutCacheControl("force above threshold")
+
+	out := applyKiroForceCacheCreation(context.Background(), group, body, "claude-sonnet-4-6")
+
+	if string(out) == string(body) {
+		t.Fatal("expected body to be rewritten")
+	}
+	if got := gjson.GetBytes(out, "messages.0.content.0.cache_control.type").String(); got != "ephemeral" {
+		t.Fatalf("cache_control.type = %q, want ephemeral; body=%s", got, out)
+	}
+	if got := gjson.GetBytes(out, "messages.0.content.0.cache_control.ttl").String(); got != "5m" {
+		t.Fatalf("cache_control.ttl = %q, want 5m; body=%s", got, out)
+	}
+}
+
+func TestKiroForceCacheCreationIgnoresNestedSchemaCacheControl(t *testing.T) {
+	group := kiroCacheGroup(1)
+	group.KiroCacheForceCreationEnabled = true
+	body := []byte(fmt.Sprintf(`{
+		"model":"claude-sonnet-4-6",
+		"tools":[{
+			"name":"demo",
+			"input_schema":{"type":"object","properties":{"cache_control":{"type":"string"}}}
+		}],
+		"messages":[{"role":"user","content":%q}]
+	}`, strings.Repeat("cacheable prompt chunk nested schema ", 512)))
+
+	out := applyKiroForceCacheCreation(context.Background(), group, body, "claude-sonnet-4-6")
+
+	if got := gjson.GetBytes(out, "messages.0.content.0.cache_control.type").String(); got != "ephemeral" {
+		t.Fatalf("nested schema cache_control must not block force injection, got %q body=%s", got, out)
+	}
+	if gjson.GetBytes(out, "tools.0.cache_control").Exists() {
+		t.Fatalf("later message candidate should receive cache_control, not tool schema body=%s", out)
+	}
+}
+
+func TestKiroForceCacheCreationSkipsBelowOfficialThreshold(t *testing.T) {
+	group := kiroCacheGroup(1)
+	group.KiroCacheForceCreationEnabled = true
+	body := []byte(`{"model":"claude-sonnet-4-6","messages":[{"role":"user","content":"short prompt"}]}`)
+
+	out := applyKiroForceCacheCreation(context.Background(), group, body, "claude-sonnet-4-6")
+
+	if string(out) != string(body) {
+		t.Fatalf("below-threshold request must not be rewritten: %s", out)
+	}
+}
+
+func TestKiroForceCacheCreationPreservesExistingCacheControl(t *testing.T) {
+	group := kiroCacheGroup(1)
+	group.KiroCacheForceCreationEnabled = true
+	body := kiroCacheRequestBody("existing 1h", true)
+
+	out := applyKiroForceCacheCreation(context.Background(), group, body, "claude-sonnet-4-6")
+
+	if string(out) != string(body) {
+		t.Fatalf("existing cache_control must not be rewritten:\n got %s\nwant %s", out, body)
+	}
+}
+
+func TestKiroForceCacheCreationStringAndArrayFingerprintsMatch(t *testing.T) {
+	resetKiroCacheTracker()
+	svc := &GatewayService{}
+	account := &Account{ID: 91, Platform: PlatformKiro}
+	group := kiroCacheGroup(1)
+	group.KiroCacheForceCreationEnabled = true
+	text := strings.Repeat("cacheable prompt chunk shape match ", 512)
+	stringBody := []byte(fmt.Sprintf(`{"model":"claude-sonnet-4-6","messages":[{"role":"user","content":%q}]}`, text))
+	forcedStringBody := applyKiroForceCacheCreation(context.Background(), group, stringBody, "claude-sonnet-4-6")
+	arrayBody := []byte(fmt.Sprintf(`{"model":"claude-sonnet-4-6","messages":[{"role":"user","content":[{"type":"text","text":%q,"cache_control":{"type":"ephemeral","ttl":"5m"}}]}]}`, text))
+
+	first := svc.buildKiroCacheEmulationUsage(context.Background(), account, group, forcedStringBody, "claude-sonnet-4-6", 2000)
+	if first == nil || first.CacheCreationInputTokens != 2000 {
+		t.Fatalf("unexpected first shape usage: %+v", first)
+	}
+	second := svc.buildKiroCacheEmulationUsage(context.Background(), account, group, arrayBody, "claude-sonnet-4-6", 2000)
+	if second == nil || second.CacheReadInputTokens != 2000 || second.CacheCreationInputTokens != 0 {
+		t.Fatalf("string and array text forms should share fingerprint: %+v", second)
+	}
+}
+
+func TestKiroForceCacheCreationFeedsCacheEmulation(t *testing.T) {
+	resetKiroCacheTracker()
+	svc := &GatewayService{}
+	account := &Account{ID: 90, Platform: PlatformKiro}
+	group := kiroCacheGroup(1)
+	group.KiroCacheForceCreationEnabled = true
+	body := kiroCacheRequestBodyWithoutCacheControl("forced usage")
+	forcedBody := applyKiroForceCacheCreation(context.Background(), group, body, "claude-sonnet-4-6")
+
+	first := svc.buildKiroCacheEmulationUsage(context.Background(), account, group, forcedBody, "claude-sonnet-4-6", 2000)
+	if first == nil || first.CacheCreationInputTokens != 2000 || first.CacheReadInputTokens != 0 {
+		t.Fatalf("unexpected first forced usage: %+v", first)
+	}
+	second := svc.buildKiroCacheEmulationUsage(context.Background(), account, group, forcedBody, "claude-sonnet-4-6", 2000)
+	if second == nil || second.CacheReadInputTokens != 2000 || second.CacheCreationInputTokens != 0 {
+		t.Fatalf("unexpected second forced usage: %+v", second)
 	}
 }
 
@@ -306,6 +411,10 @@ func kiroCacheRequestBody(label string, oneHour bool) []byte {
 		ttl = `,"ttl":"1h"`
 	}
 	return []byte(fmt.Sprintf(`{"model":"claude-sonnet-4-6","messages":[{"role":"user","content":[{"type":"text","text":%q,"cache_control":{"type":"ephemeral"%s}}]}]}`, strings.Repeat("cacheable prompt chunk "+label+" ", 512), ttl))
+}
+
+func kiroCacheRequestBodyWithoutCacheControl(label string) []byte {
+	return []byte(fmt.Sprintf(`{"model":"claude-sonnet-4-6","messages":[{"role":"user","content":%q}]}`, strings.Repeat("cacheable prompt chunk "+label+" ", 512)))
 }
 
 func kiroCacheMultiMessageBody(prefixLabel, tailLabel string) []byte {

@@ -145,11 +145,12 @@ type Group struct {
 	ReasoningEffortMappings []domain.ReasoningEffortMapping `json:"reasoning_effort_mappings"`
 
 	// Kiro 模拟缓存配置（仅 Kiro 平台生效）
-	KiroCacheEmulationEnabled   bool    `json:"kiro_cache_emulation_enabled"`
-	KiroAutoStickyEnabled       bool    `json:"kiro_auto_sticky_enabled"`
-	KiroStickySessionTTLSeconds int     `json:"kiro_sticky_session_ttl_seconds"`
-	KiroCacheEmulationRatio     float64 `json:"kiro_cache_emulation_ratio"`
-	KiroEndpointMode            string  `json:"kiro_endpoint_mode"`
+	KiroCacheEmulationEnabled     bool    `json:"kiro_cache_emulation_enabled"`
+	KiroCacheForceCreationEnabled bool    `json:"kiro_cache_force_creation_enabled"`
+	KiroAutoStickyEnabled         bool    `json:"kiro_auto_sticky_enabled"`
+	KiroStickySessionTTLSeconds   int     `json:"kiro_sticky_session_ttl_seconds"`
+	KiroCacheEmulationRatio       float64 `json:"kiro_cache_emulation_ratio"`
+	KiroEndpointMode              string  `json:"kiro_endpoint_mode"`
 
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`

@@ -179,15 +179,17 @@ func TestNormalizeGroupRuntimeFields_KiroStickySessionTTL(t *testing.T) {
 	require.Equal(t, MinKiroStickySessionTTLSeconds, kiro.KiroStickySessionTTLSeconds)
 
 	nonKiro := &Group{
-		Platform:                    PlatformAnthropic,
-		KiroAutoStickyEnabled:       true,
-		KiroStickySessionTTLSeconds: 7200,
-		KiroCacheEmulationEnabled:   true,
-		KiroCacheEmulationRatio:     0.5,
+		Platform:                      PlatformAnthropic,
+		KiroAutoStickyEnabled:         true,
+		KiroStickySessionTTLSeconds:   7200,
+		KiroCacheEmulationEnabled:     true,
+		KiroCacheForceCreationEnabled: true,
+		KiroCacheEmulationRatio:       0.5,
 	}
 	NormalizeGroupRuntimeFields(nonKiro)
 	require.False(t, nonKiro.KiroAutoStickyEnabled)
 	require.Zero(t, nonKiro.KiroStickySessionTTLSeconds)
 	require.False(t, nonKiro.KiroCacheEmulationEnabled)
+	require.False(t, nonKiro.KiroCacheForceCreationEnabled)
 	require.Zero(t, nonKiro.KiroCacheEmulationRatio)
 }

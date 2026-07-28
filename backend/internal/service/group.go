@@ -93,10 +93,11 @@ type Group struct {
 	RPMLimit int
 
 	// Kiro 模拟缓存配置（仅 Kiro 平台生效）。
-	KiroCacheEmulationEnabled   bool
-	KiroAutoStickyEnabled       bool
-	KiroStickySessionTTLSeconds int
-	KiroCacheEmulationRatio     float64
+	KiroCacheEmulationEnabled     bool
+	KiroCacheForceCreationEnabled bool
+	KiroAutoStickyEnabled         bool
+	KiroStickySessionTTLSeconds   int
+	KiroCacheEmulationRatio       float64
 
 	// Kiro 推理 endpoint 模式（仅 platform=kiro 生效）。
 	// "q"   = AWS Q (q.{region}.amazonaws.com)，默认，与其它工具共用限流池
@@ -120,6 +121,10 @@ type Group struct {
 
 func (g *Group) EffectiveKiroCacheEmulationEnabled() bool {
 	return g != nil && g.Platform == PlatformKiro && g.KiroCacheEmulationEnabled && g.EffectiveKiroCacheEmulationRatio() > 0
+}
+
+func (g *Group) EffectiveKiroCacheForceCreationEnabled() bool {
+	return g != nil && g.EffectiveKiroCacheEmulationEnabled() && g.KiroCacheForceCreationEnabled
 }
 
 func (g *Group) EffectiveKiroAutoStickyEnabled() bool {
@@ -188,6 +193,7 @@ func normalizeKiroCacheEmulationFields(g *Group) {
 		g.KiroAutoStickyEnabled = false
 		g.KiroStickySessionTTLSeconds = 0
 		g.KiroCacheEmulationEnabled = false
+		g.KiroCacheForceCreationEnabled = false
 		g.KiroCacheEmulationRatio = 0
 		return
 	}

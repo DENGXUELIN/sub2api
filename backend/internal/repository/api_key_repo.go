@@ -955,6 +955,7 @@ func groupEntityToService(g *dbent.Group) *service.Group {
 		ModelsListConfig:                g.ModelsListConfig,
 		RPMLimit:                        g.RpmLimit,
 		KiroCacheEmulationEnabled:       g.KiroCacheEmulationEnabled,
+		KiroCacheForceCreationEnabled:   g.KiroCacheForceCreationEnabled,
 		KiroAutoStickyEnabled:           g.KiroAutoStickyEnabled,
 		KiroStickySessionTTLSeconds:     g.KiroStickySessionTTLSeconds,
 		KiroCacheEmulationRatio:         g.KiroCacheEmulationRatio,
