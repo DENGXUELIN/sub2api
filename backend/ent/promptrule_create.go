@@ -132,6 +132,34 @@ func (_c *PromptRuleCreate) SetNillableAction(v *string) *PromptRuleCreate {
 	return _c
 }
 
+// SetMatchPattern sets the "match_pattern" field.
+func (_c *PromptRuleCreate) SetMatchPattern(v string) *PromptRuleCreate {
+	_c.mutation.SetMatchPattern(v)
+	return _c
+}
+
+// SetNillableMatchPattern sets the "match_pattern" field if the given value is not nil.
+func (_c *PromptRuleCreate) SetNillableMatchPattern(v *string) *PromptRuleCreate {
+	if v != nil {
+		_c.SetMatchPattern(*v)
+	}
+	return _c
+}
+
+// SetMatchMode sets the "match_mode" field.
+func (_c *PromptRuleCreate) SetMatchMode(v string) *PromptRuleCreate {
+	_c.mutation.SetMatchMode(v)
+	return _c
+}
+
+// SetNillableMatchMode sets the "match_mode" field if the given value is not nil.
+func (_c *PromptRuleCreate) SetNillableMatchMode(v *string) *PromptRuleCreate {
+	if v != nil {
+		_c.SetMatchMode(*v)
+	}
+	return _c
+}
+
 // SetGroupIds sets the "group_ids" field.
 func (_c *PromptRuleCreate) SetGroupIds(v []int64) *PromptRuleCreate {
 	_c.mutation.SetGroupIds(v)
@@ -203,6 +231,10 @@ func (_c *PromptRuleCreate) defaults() {
 		v := promptrule.DefaultAction
 		_c.mutation.SetAction(v)
 	}
+	if _, ok := _c.mutation.MatchMode(); !ok {
+		v := promptrule.DefaultMatchMode
+		_c.mutation.SetMatchMode(v)
+	}
 }
 
 // check runs all checks and user-defined validators on the builder.
@@ -249,6 +281,11 @@ func (_c *PromptRuleCreate) check() error {
 	if v, ok := _c.mutation.Action(); ok {
 		if err := promptrule.ActionValidator(v); err != nil {
 			return &ValidationError{Name: "action", err: fmt.Errorf(`ent: validator failed for field "PromptRule.action": %w`, err)}
+		}
+	}
+	if v, ok := _c.mutation.MatchMode(); ok {
+		if err := promptrule.MatchModeValidator(v); err != nil {
+			return &ValidationError{Name: "match_mode", err: fmt.Errorf(`ent: validator failed for field "PromptRule.match_mode": %w`, err)}
 		}
 	}
 	return nil
@@ -313,6 +350,14 @@ func (_c *PromptRuleCreate) createSpec() (*PromptRule, *sqlgraph.CreateSpec) {
 	if value, ok := _c.mutation.Action(); ok {
 		_spec.SetField(promptrule.FieldAction, field.TypeString, value)
 		_node.Action = value
+	}
+	if value, ok := _c.mutation.MatchPattern(); ok {
+		_spec.SetField(promptrule.FieldMatchPattern, field.TypeString, value)
+		_node.MatchPattern = &value
+	}
+	if value, ok := _c.mutation.MatchMode(); ok {
+		_spec.SetField(promptrule.FieldMatchMode, field.TypeString, value)
+		_node.MatchMode = value
 	}
 	if value, ok := _c.mutation.GroupIds(); ok {
 		_spec.SetField(promptrule.FieldGroupIds, field.TypeJSON, value)
@@ -479,6 +524,42 @@ func (u *PromptRuleUpsert) SetAction(v string) *PromptRuleUpsert {
 // UpdateAction sets the "action" field to the value that was provided on create.
 func (u *PromptRuleUpsert) UpdateAction() *PromptRuleUpsert {
 	u.SetExcluded(promptrule.FieldAction)
+	return u
+}
+
+// SetMatchPattern sets the "match_pattern" field.
+func (u *PromptRuleUpsert) SetMatchPattern(v string) *PromptRuleUpsert {
+	u.Set(promptrule.FieldMatchPattern, v)
+	return u
+}
+
+// UpdateMatchPattern sets the "match_pattern" field to the value that was provided on create.
+func (u *PromptRuleUpsert) UpdateMatchPattern() *PromptRuleUpsert {
+	u.SetExcluded(promptrule.FieldMatchPattern)
+	return u
+}
+
+// ClearMatchPattern clears the value of the "match_pattern" field.
+func (u *PromptRuleUpsert) ClearMatchPattern() *PromptRuleUpsert {
+	u.SetNull(promptrule.FieldMatchPattern)
+	return u
+}
+
+// SetMatchMode sets the "match_mode" field.
+func (u *PromptRuleUpsert) SetMatchMode(v string) *PromptRuleUpsert {
+	u.Set(promptrule.FieldMatchMode, v)
+	return u
+}
+
+// UpdateMatchMode sets the "match_mode" field to the value that was provided on create.
+func (u *PromptRuleUpsert) UpdateMatchMode() *PromptRuleUpsert {
+	u.SetExcluded(promptrule.FieldMatchMode)
+	return u
+}
+
+// ClearMatchMode clears the value of the "match_mode" field.
+func (u *PromptRuleUpsert) ClearMatchMode() *PromptRuleUpsert {
+	u.SetNull(promptrule.FieldMatchMode)
 	return u
 }
 
@@ -686,6 +767,48 @@ func (u *PromptRuleUpsertOne) SetAction(v string) *PromptRuleUpsertOne {
 func (u *PromptRuleUpsertOne) UpdateAction() *PromptRuleUpsertOne {
 	return u.Update(func(s *PromptRuleUpsert) {
 		s.UpdateAction()
+	})
+}
+
+// SetMatchPattern sets the "match_pattern" field.
+func (u *PromptRuleUpsertOne) SetMatchPattern(v string) *PromptRuleUpsertOne {
+	return u.Update(func(s *PromptRuleUpsert) {
+		s.SetMatchPattern(v)
+	})
+}
+
+// UpdateMatchPattern sets the "match_pattern" field to the value that was provided on create.
+func (u *PromptRuleUpsertOne) UpdateMatchPattern() *PromptRuleUpsertOne {
+	return u.Update(func(s *PromptRuleUpsert) {
+		s.UpdateMatchPattern()
+	})
+}
+
+// ClearMatchPattern clears the value of the "match_pattern" field.
+func (u *PromptRuleUpsertOne) ClearMatchPattern() *PromptRuleUpsertOne {
+	return u.Update(func(s *PromptRuleUpsert) {
+		s.ClearMatchPattern()
+	})
+}
+
+// SetMatchMode sets the "match_mode" field.
+func (u *PromptRuleUpsertOne) SetMatchMode(v string) *PromptRuleUpsertOne {
+	return u.Update(func(s *PromptRuleUpsert) {
+		s.SetMatchMode(v)
+	})
+}
+
+// UpdateMatchMode sets the "match_mode" field to the value that was provided on create.
+func (u *PromptRuleUpsertOne) UpdateMatchMode() *PromptRuleUpsertOne {
+	return u.Update(func(s *PromptRuleUpsert) {
+		s.UpdateMatchMode()
+	})
+}
+
+// ClearMatchMode clears the value of the "match_mode" field.
+func (u *PromptRuleUpsertOne) ClearMatchMode() *PromptRuleUpsertOne {
+	return u.Update(func(s *PromptRuleUpsert) {
+		s.ClearMatchMode()
 	})
 }
 
@@ -1065,6 +1188,48 @@ func (u *PromptRuleUpsertBulk) SetAction(v string) *PromptRuleUpsertBulk {
 func (u *PromptRuleUpsertBulk) UpdateAction() *PromptRuleUpsertBulk {
 	return u.Update(func(s *PromptRuleUpsert) {
 		s.UpdateAction()
+	})
+}
+
+// SetMatchPattern sets the "match_pattern" field.
+func (u *PromptRuleUpsertBulk) SetMatchPattern(v string) *PromptRuleUpsertBulk {
+	return u.Update(func(s *PromptRuleUpsert) {
+		s.SetMatchPattern(v)
+	})
+}
+
+// UpdateMatchPattern sets the "match_pattern" field to the value that was provided on create.
+func (u *PromptRuleUpsertBulk) UpdateMatchPattern() *PromptRuleUpsertBulk {
+	return u.Update(func(s *PromptRuleUpsert) {
+		s.UpdateMatchPattern()
+	})
+}
+
+// ClearMatchPattern clears the value of the "match_pattern" field.
+func (u *PromptRuleUpsertBulk) ClearMatchPattern() *PromptRuleUpsertBulk {
+	return u.Update(func(s *PromptRuleUpsert) {
+		s.ClearMatchPattern()
+	})
+}
+
+// SetMatchMode sets the "match_mode" field.
+func (u *PromptRuleUpsertBulk) SetMatchMode(v string) *PromptRuleUpsertBulk {
+	return u.Update(func(s *PromptRuleUpsert) {
+		s.SetMatchMode(v)
+	})
+}
+
+// UpdateMatchMode sets the "match_mode" field to the value that was provided on create.
+func (u *PromptRuleUpsertBulk) UpdateMatchMode() *PromptRuleUpsertBulk {
+	return u.Update(func(s *PromptRuleUpsert) {
+		s.UpdateMatchMode()
+	})
+}
+
+// ClearMatchMode clears the value of the "match_mode" field.
+func (u *PromptRuleUpsertBulk) ClearMatchMode() *PromptRuleUpsertBulk {
+	return u.Update(func(s *PromptRuleUpsert) {
+		s.ClearMatchMode()
 	})
 }
 

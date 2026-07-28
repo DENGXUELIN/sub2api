@@ -130,11 +130,11 @@ func (s *PromptRuleService) Delete(ctx context.Context, id int64) error {
 	return nil
 }
 
-// GetMatchingRules 根据分组和模型获取匹配的规则，返回 prepend 和 append 两组
-func (s *PromptRuleService) GetMatchingRules(groupID *int64, modelID string) (prepend, append_ []*model.PromptRule) {
+// GetMatchingRules 根据分组和模型获取匹配的规则，返回 prepend、append 和 replace 三组
+func (s *PromptRuleService) GetMatchingRules(groupID *int64, modelID string) (prepend, append_, replace []*model.PromptRule) {
 	rules := s.getCachedRules()
 	if len(rules) == 0 {
-		return nil, nil
+		return nil, nil, nil
 	}
 
 	for _, rule := range rules {
@@ -147,13 +147,16 @@ func (s *PromptRuleService) GetMatchingRules(groupID *int64, modelID string) (pr
 		if !s.modelMatches(rule, modelID) {
 			continue
 		}
-		if rule.Action == model.PromptActionPrepend {
+		switch rule.Action {
+		case model.PromptActionPrepend:
 			prepend = append(prepend, rule)
-		} else {
+		case model.PromptActionReplace:
+			replace = append(replace, rule)
+		default:
 			append_ = append(append_, rule)
 		}
 	}
-	return prepend, append_
+	return prepend, append_, replace
 }
 
 func (s *PromptRuleService) groupMatches(rule *model.PromptRule, groupID *int64) bool {

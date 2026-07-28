@@ -130,6 +130,12 @@ func (r *promptRuleRepository) Create(ctx context.Context, rule *model.PromptRul
 	if rule.Description != nil {
 		builder.SetDescription(*rule.Description)
 	}
+	if rule.MatchPattern != "" {
+		builder.SetMatchPattern(rule.MatchPattern)
+	}
+	if rule.MatchMode != "" {
+		builder.SetMatchMode(rule.MatchMode)
+	}
 	if len(rule.GroupIDs) > 0 {
 		builder.SetGroupIds(rule.GroupIDs)
 	}
@@ -157,6 +163,14 @@ func (r *promptRuleRepository) Update(ctx context.Context, rule *model.PromptRul
 		builder.SetDescription(*rule.Description)
 	} else {
 		builder.ClearDescription()
+	}
+	if rule.MatchPattern != "" {
+		builder.SetMatchPattern(rule.MatchPattern)
+	} else {
+		builder.ClearMatchPattern()
+	}
+	if rule.MatchMode != "" {
+		builder.SetMatchMode(rule.MatchMode)
 	}
 	if len(rule.GroupIDs) > 0 {
 		builder.SetGroupIds(rule.GroupIDs)
@@ -189,6 +203,7 @@ func (r *promptRuleRepository) toModel(e *ent.PromptRule) *model.PromptRule {
 		Role:      e.Role,
 		Content:   e.Content,
 		Action:    e.Action,
+		MatchMode: e.MatchMode,
 		GroupIDs:  e.GroupIds,
 		ModelIDs:  e.ModelIds,
 		CreatedAt: e.CreatedAt,
@@ -196,6 +211,9 @@ func (r *promptRuleRepository) toModel(e *ent.PromptRule) *model.PromptRule {
 	}
 	if e.Description != nil {
 		rule.Description = e.Description
+	}
+	if e.MatchPattern != nil {
+		rule.MatchPattern = *e.MatchPattern
 	}
 	if rule.GroupIDs == nil {
 		rule.GroupIDs = []int64{}

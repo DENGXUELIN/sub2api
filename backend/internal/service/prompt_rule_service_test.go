@@ -66,7 +66,7 @@ func TestPromptRuleServiceGetMatchingRules(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			svc := &PromptRuleService{localCache: []*model.PromptRule{tt.rule}}
 
-			prepend, appendRules := svc.GetMatchingRules(&groupID, tt.modelID)
+			prepend, appendRules, replaceRules := svc.GetMatchingRules(&groupID, tt.modelID)
 
 			if tt.want {
 				require.Len(t, prepend, 1)
@@ -74,6 +74,7 @@ func TestPromptRuleServiceGetMatchingRules(t *testing.T) {
 				require.Empty(t, prepend)
 			}
 			require.Empty(t, appendRules)
+			require.Empty(t, replaceRules)
 		})
 	}
 }

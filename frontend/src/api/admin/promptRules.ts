@@ -10,7 +10,9 @@ export interface PromptRule {
   order: number;
   role: "system" | "user" | "assistant";
   content: string;
-  action: "prepend" | "append";
+  action: "prepend" | "append" | "replace";
+  match_pattern: string;
+  match_mode: "plain" | "regex";
   group_ids: number[];
   model_ids: string[];
   created_at: string;
@@ -24,7 +26,9 @@ export interface CreatePromptRuleRequest {
   order?: number;
   role?: "system" | "user" | "assistant";
   content: string;
-  action?: "prepend" | "append";
+  action?: "prepend" | "append" | "replace";
+  match_pattern?: string;
+  match_mode?: "plain" | "regex";
   group_ids?: number[];
   model_ids?: string[];
 }
@@ -36,7 +40,9 @@ export interface UpdatePromptRuleRequest {
   order?: number;
   role?: "system" | "user" | "assistant";
   content?: string;
-  action?: "prepend" | "append";
+  action?: "prepend" | "append" | "replace";
+  match_pattern?: string;
+  match_mode?: "plain" | "regex";
   group_ids?: number[];
   model_ids?: string[];
 }

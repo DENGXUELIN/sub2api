@@ -146,6 +146,46 @@ func (_u *PromptRuleUpdate) SetNillableAction(v *string) *PromptRuleUpdate {
 	return _u
 }
 
+// SetMatchPattern sets the "match_pattern" field.
+func (_u *PromptRuleUpdate) SetMatchPattern(v string) *PromptRuleUpdate {
+	_u.mutation.SetMatchPattern(v)
+	return _u
+}
+
+// SetNillableMatchPattern sets the "match_pattern" field if the given value is not nil.
+func (_u *PromptRuleUpdate) SetNillableMatchPattern(v *string) *PromptRuleUpdate {
+	if v != nil {
+		_u.SetMatchPattern(*v)
+	}
+	return _u
+}
+
+// ClearMatchPattern clears the value of the "match_pattern" field.
+func (_u *PromptRuleUpdate) ClearMatchPattern() *PromptRuleUpdate {
+	_u.mutation.ClearMatchPattern()
+	return _u
+}
+
+// SetMatchMode sets the "match_mode" field.
+func (_u *PromptRuleUpdate) SetMatchMode(v string) *PromptRuleUpdate {
+	_u.mutation.SetMatchMode(v)
+	return _u
+}
+
+// SetNillableMatchMode sets the "match_mode" field if the given value is not nil.
+func (_u *PromptRuleUpdate) SetNillableMatchMode(v *string) *PromptRuleUpdate {
+	if v != nil {
+		_u.SetMatchMode(*v)
+	}
+	return _u
+}
+
+// ClearMatchMode clears the value of the "match_mode" field.
+func (_u *PromptRuleUpdate) ClearMatchMode() *PromptRuleUpdate {
+	_u.mutation.ClearMatchMode()
+	return _u
+}
+
 // SetGroupIds sets the "group_ids" field.
 func (_u *PromptRuleUpdate) SetGroupIds(v []int64) *PromptRuleUpdate {
 	_u.mutation.SetGroupIds(v)
@@ -245,6 +285,11 @@ func (_u *PromptRuleUpdate) check() error {
 			return &ValidationError{Name: "action", err: fmt.Errorf(`ent: validator failed for field "PromptRule.action": %w`, err)}
 		}
 	}
+	if v, ok := _u.mutation.MatchMode(); ok {
+		if err := promptrule.MatchModeValidator(v); err != nil {
+			return &ValidationError{Name: "match_mode", err: fmt.Errorf(`ent: validator failed for field "PromptRule.match_mode": %w`, err)}
+		}
+	}
 	return nil
 }
 
@@ -289,6 +334,18 @@ func (_u *PromptRuleUpdate) sqlSave(ctx context.Context) (_node int, err error) 
 	}
 	if value, ok := _u.mutation.Action(); ok {
 		_spec.SetField(promptrule.FieldAction, field.TypeString, value)
+	}
+	if value, ok := _u.mutation.MatchPattern(); ok {
+		_spec.SetField(promptrule.FieldMatchPattern, field.TypeString, value)
+	}
+	if _u.mutation.MatchPatternCleared() {
+		_spec.ClearField(promptrule.FieldMatchPattern, field.TypeString)
+	}
+	if value, ok := _u.mutation.MatchMode(); ok {
+		_spec.SetField(promptrule.FieldMatchMode, field.TypeString, value)
+	}
+	if _u.mutation.MatchModeCleared() {
+		_spec.ClearField(promptrule.FieldMatchMode, field.TypeString)
 	}
 	if value, ok := _u.mutation.GroupIds(); ok {
 		_spec.SetField(promptrule.FieldGroupIds, field.TypeJSON, value)
@@ -449,6 +506,46 @@ func (_u *PromptRuleUpdateOne) SetNillableAction(v *string) *PromptRuleUpdateOne
 	return _u
 }
 
+// SetMatchPattern sets the "match_pattern" field.
+func (_u *PromptRuleUpdateOne) SetMatchPattern(v string) *PromptRuleUpdateOne {
+	_u.mutation.SetMatchPattern(v)
+	return _u
+}
+
+// SetNillableMatchPattern sets the "match_pattern" field if the given value is not nil.
+func (_u *PromptRuleUpdateOne) SetNillableMatchPattern(v *string) *PromptRuleUpdateOne {
+	if v != nil {
+		_u.SetMatchPattern(*v)
+	}
+	return _u
+}
+
+// ClearMatchPattern clears the value of the "match_pattern" field.
+func (_u *PromptRuleUpdateOne) ClearMatchPattern() *PromptRuleUpdateOne {
+	_u.mutation.ClearMatchPattern()
+	return _u
+}
+
+// SetMatchMode sets the "match_mode" field.
+func (_u *PromptRuleUpdateOne) SetMatchMode(v string) *PromptRuleUpdateOne {
+	_u.mutation.SetMatchMode(v)
+	return _u
+}
+
+// SetNillableMatchMode sets the "match_mode" field if the given value is not nil.
+func (_u *PromptRuleUpdateOne) SetNillableMatchMode(v *string) *PromptRuleUpdateOne {
+	if v != nil {
+		_u.SetMatchMode(*v)
+	}
+	return _u
+}
+
+// ClearMatchMode clears the value of the "match_mode" field.
+func (_u *PromptRuleUpdateOne) ClearMatchMode() *PromptRuleUpdateOne {
+	_u.mutation.ClearMatchMode()
+	return _u
+}
+
 // SetGroupIds sets the "group_ids" field.
 func (_u *PromptRuleUpdateOne) SetGroupIds(v []int64) *PromptRuleUpdateOne {
 	_u.mutation.SetGroupIds(v)
@@ -561,6 +658,11 @@ func (_u *PromptRuleUpdateOne) check() error {
 			return &ValidationError{Name: "action", err: fmt.Errorf(`ent: validator failed for field "PromptRule.action": %w`, err)}
 		}
 	}
+	if v, ok := _u.mutation.MatchMode(); ok {
+		if err := promptrule.MatchModeValidator(v); err != nil {
+			return &ValidationError{Name: "match_mode", err: fmt.Errorf(`ent: validator failed for field "PromptRule.match_mode": %w`, err)}
+		}
+	}
 	return nil
 }
 
@@ -622,6 +724,18 @@ func (_u *PromptRuleUpdateOne) sqlSave(ctx context.Context) (_node *PromptRule, 
 	}
 	if value, ok := _u.mutation.Action(); ok {
 		_spec.SetField(promptrule.FieldAction, field.TypeString, value)
+	}
+	if value, ok := _u.mutation.MatchPattern(); ok {
+		_spec.SetField(promptrule.FieldMatchPattern, field.TypeString, value)
+	}
+	if _u.mutation.MatchPatternCleared() {
+		_spec.ClearField(promptrule.FieldMatchPattern, field.TypeString)
+	}
+	if value, ok := _u.mutation.MatchMode(); ok {
+		_spec.SetField(promptrule.FieldMatchMode, field.TypeString, value)
+	}
+	if _u.mutation.MatchModeCleared() {
+		_spec.ClearField(promptrule.FieldMatchMode, field.TypeString)
 	}
 	if value, ok := _u.mutation.GroupIds(); ok {
 		_spec.SetField(promptrule.FieldGroupIds, field.TypeJSON, value)

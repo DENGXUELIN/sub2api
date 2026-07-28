@@ -99,6 +99,16 @@ func Action(v string) predicate.PromptRule {
 	return predicate.PromptRule(sql.FieldEQ(FieldAction, v))
 }
 
+// MatchPattern applies equality check predicate on the "match_pattern" field. It's identical to MatchPatternEQ.
+func MatchPattern(v string) predicate.PromptRule {
+	return predicate.PromptRule(sql.FieldEQ(FieldMatchPattern, v))
+}
+
+// MatchMode applies equality check predicate on the "match_mode" field. It's identical to MatchModeEQ.
+func MatchMode(v string) predicate.PromptRule {
+	return predicate.PromptRule(sql.FieldEQ(FieldMatchMode, v))
+}
+
 // CreatedAtEQ applies the EQ predicate on the "created_at" field.
 func CreatedAtEQ(v time.Time) predicate.PromptRule {
 	return predicate.PromptRule(sql.FieldEQ(FieldCreatedAt, v))
@@ -562,6 +572,156 @@ func ActionEqualFold(v string) predicate.PromptRule {
 // ActionContainsFold applies the ContainsFold predicate on the "action" field.
 func ActionContainsFold(v string) predicate.PromptRule {
 	return predicate.PromptRule(sql.FieldContainsFold(FieldAction, v))
+}
+
+// MatchPatternEQ applies the EQ predicate on the "match_pattern" field.
+func MatchPatternEQ(v string) predicate.PromptRule {
+	return predicate.PromptRule(sql.FieldEQ(FieldMatchPattern, v))
+}
+
+// MatchPatternNEQ applies the NEQ predicate on the "match_pattern" field.
+func MatchPatternNEQ(v string) predicate.PromptRule {
+	return predicate.PromptRule(sql.FieldNEQ(FieldMatchPattern, v))
+}
+
+// MatchPatternIn applies the In predicate on the "match_pattern" field.
+func MatchPatternIn(vs ...string) predicate.PromptRule {
+	return predicate.PromptRule(sql.FieldIn(FieldMatchPattern, vs...))
+}
+
+// MatchPatternNotIn applies the NotIn predicate on the "match_pattern" field.
+func MatchPatternNotIn(vs ...string) predicate.PromptRule {
+	return predicate.PromptRule(sql.FieldNotIn(FieldMatchPattern, vs...))
+}
+
+// MatchPatternGT applies the GT predicate on the "match_pattern" field.
+func MatchPatternGT(v string) predicate.PromptRule {
+	return predicate.PromptRule(sql.FieldGT(FieldMatchPattern, v))
+}
+
+// MatchPatternGTE applies the GTE predicate on the "match_pattern" field.
+func MatchPatternGTE(v string) predicate.PromptRule {
+	return predicate.PromptRule(sql.FieldGTE(FieldMatchPattern, v))
+}
+
+// MatchPatternLT applies the LT predicate on the "match_pattern" field.
+func MatchPatternLT(v string) predicate.PromptRule {
+	return predicate.PromptRule(sql.FieldLT(FieldMatchPattern, v))
+}
+
+// MatchPatternLTE applies the LTE predicate on the "match_pattern" field.
+func MatchPatternLTE(v string) predicate.PromptRule {
+	return predicate.PromptRule(sql.FieldLTE(FieldMatchPattern, v))
+}
+
+// MatchPatternContains applies the Contains predicate on the "match_pattern" field.
+func MatchPatternContains(v string) predicate.PromptRule {
+	return predicate.PromptRule(sql.FieldContains(FieldMatchPattern, v))
+}
+
+// MatchPatternHasPrefix applies the HasPrefix predicate on the "match_pattern" field.
+func MatchPatternHasPrefix(v string) predicate.PromptRule {
+	return predicate.PromptRule(sql.FieldHasPrefix(FieldMatchPattern, v))
+}
+
+// MatchPatternHasSuffix applies the HasSuffix predicate on the "match_pattern" field.
+func MatchPatternHasSuffix(v string) predicate.PromptRule {
+	return predicate.PromptRule(sql.FieldHasSuffix(FieldMatchPattern, v))
+}
+
+// MatchPatternIsNil applies the IsNil predicate on the "match_pattern" field.
+func MatchPatternIsNil() predicate.PromptRule {
+	return predicate.PromptRule(sql.FieldIsNull(FieldMatchPattern))
+}
+
+// MatchPatternNotNil applies the NotNil predicate on the "match_pattern" field.
+func MatchPatternNotNil() predicate.PromptRule {
+	return predicate.PromptRule(sql.FieldNotNull(FieldMatchPattern))
+}
+
+// MatchPatternEqualFold applies the EqualFold predicate on the "match_pattern" field.
+func MatchPatternEqualFold(v string) predicate.PromptRule {
+	return predicate.PromptRule(sql.FieldEqualFold(FieldMatchPattern, v))
+}
+
+// MatchPatternContainsFold applies the ContainsFold predicate on the "match_pattern" field.
+func MatchPatternContainsFold(v string) predicate.PromptRule {
+	return predicate.PromptRule(sql.FieldContainsFold(FieldMatchPattern, v))
+}
+
+// MatchModeEQ applies the EQ predicate on the "match_mode" field.
+func MatchModeEQ(v string) predicate.PromptRule {
+	return predicate.PromptRule(sql.FieldEQ(FieldMatchMode, v))
+}
+
+// MatchModeNEQ applies the NEQ predicate on the "match_mode" field.
+func MatchModeNEQ(v string) predicate.PromptRule {
+	return predicate.PromptRule(sql.FieldNEQ(FieldMatchMode, v))
+}
+
+// MatchModeIn applies the In predicate on the "match_mode" field.
+func MatchModeIn(vs ...string) predicate.PromptRule {
+	return predicate.PromptRule(sql.FieldIn(FieldMatchMode, vs...))
+}
+
+// MatchModeNotIn applies the NotIn predicate on the "match_mode" field.
+func MatchModeNotIn(vs ...string) predicate.PromptRule {
+	return predicate.PromptRule(sql.FieldNotIn(FieldMatchMode, vs...))
+}
+
+// MatchModeGT applies the GT predicate on the "match_mode" field.
+func MatchModeGT(v string) predicate.PromptRule {
+	return predicate.PromptRule(sql.FieldGT(FieldMatchMode, v))
+}
+
+// MatchModeGTE applies the GTE predicate on the "match_mode" field.
+func MatchModeGTE(v string) predicate.PromptRule {
+	return predicate.PromptRule(sql.FieldGTE(FieldMatchMode, v))
+}
+
+// MatchModeLT applies the LT predicate on the "match_mode" field.
+func MatchModeLT(v string) predicate.PromptRule {
+	return predicate.PromptRule(sql.FieldLT(FieldMatchMode, v))
+}
+
+// MatchModeLTE applies the LTE predicate on the "match_mode" field.
+func MatchModeLTE(v string) predicate.PromptRule {
+	return predicate.PromptRule(sql.FieldLTE(FieldMatchMode, v))
+}
+
+// MatchModeContains applies the Contains predicate on the "match_mode" field.
+func MatchModeContains(v string) predicate.PromptRule {
+	return predicate.PromptRule(sql.FieldContains(FieldMatchMode, v))
+}
+
+// MatchModeHasPrefix applies the HasPrefix predicate on the "match_mode" field.
+func MatchModeHasPrefix(v string) predicate.PromptRule {
+	return predicate.PromptRule(sql.FieldHasPrefix(FieldMatchMode, v))
+}
+
+// MatchModeHasSuffix applies the HasSuffix predicate on the "match_mode" field.
+func MatchModeHasSuffix(v string) predicate.PromptRule {
+	return predicate.PromptRule(sql.FieldHasSuffix(FieldMatchMode, v))
+}
+
+// MatchModeIsNil applies the IsNil predicate on the "match_mode" field.
+func MatchModeIsNil() predicate.PromptRule {
+	return predicate.PromptRule(sql.FieldIsNull(FieldMatchMode))
+}
+
+// MatchModeNotNil applies the NotNil predicate on the "match_mode" field.
+func MatchModeNotNil() predicate.PromptRule {
+	return predicate.PromptRule(sql.FieldNotNull(FieldMatchMode))
+}
+
+// MatchModeEqualFold applies the EqualFold predicate on the "match_mode" field.
+func MatchModeEqualFold(v string) predicate.PromptRule {
+	return predicate.PromptRule(sql.FieldEqualFold(FieldMatchMode, v))
+}
+
+// MatchModeContainsFold applies the ContainsFold predicate on the "match_mode" field.
+func MatchModeContainsFold(v string) predicate.PromptRule {
+	return predicate.PromptRule(sql.FieldContainsFold(FieldMatchMode, v))
 }
 
 // GroupIdsIsNil applies the IsNil predicate on the "group_ids" field.

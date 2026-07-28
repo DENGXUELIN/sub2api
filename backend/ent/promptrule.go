@@ -36,6 +36,10 @@ type PromptRule struct {
 	Content string `json:"content,omitempty"`
 	// Action holds the value of the "action" field.
 	Action string `json:"action,omitempty"`
+	// MatchPattern holds the value of the "match_pattern" field.
+	MatchPattern *string `json:"match_pattern,omitempty"`
+	// MatchMode holds the value of the "match_mode" field.
+	MatchMode string `json:"match_mode,omitempty"`
 	// GroupIds holds the value of the "group_ids" field.
 	GroupIds []int64 `json:"group_ids,omitempty"`
 	// ModelIds holds the value of the "model_ids" field.
@@ -54,7 +58,7 @@ func (*PromptRule) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullBool)
 		case promptrule.FieldID, promptrule.FieldOrder:
 			values[i] = new(sql.NullInt64)
-		case promptrule.FieldName, promptrule.FieldDescription, promptrule.FieldRole, promptrule.FieldContent, promptrule.FieldAction:
+		case promptrule.FieldName, promptrule.FieldDescription, promptrule.FieldRole, promptrule.FieldContent, promptrule.FieldAction, promptrule.FieldMatchPattern, promptrule.FieldMatchMode:
 			values[i] = new(sql.NullString)
 		case promptrule.FieldCreatedAt, promptrule.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
@@ -133,6 +137,19 @@ func (_m *PromptRule) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field action", values[i])
 			} else if value.Valid {
 				_m.Action = value.String
+			}
+		case promptrule.FieldMatchPattern:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field match_pattern", values[i])
+			} else if value.Valid {
+				_m.MatchPattern = new(string)
+				*_m.MatchPattern = value.String
+			}
+		case promptrule.FieldMatchMode:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field match_mode", values[i])
+			} else if value.Valid {
+				_m.MatchMode = value.String
 			}
 		case promptrule.FieldGroupIds:
 			if value, ok := values[i].(*[]byte); !ok {
@@ -214,6 +231,14 @@ func (_m *PromptRule) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("action=")
 	builder.WriteString(_m.Action)
+	builder.WriteString(", ")
+	if v := _m.MatchPattern; v != nil {
+		builder.WriteString("match_pattern=")
+		builder.WriteString(*v)
+	}
+	builder.WriteString(", ")
+	builder.WriteString("match_mode=")
+	builder.WriteString(_m.MatchMode)
 	builder.WriteString(", ")
 	builder.WriteString("group_ids=")
 	builder.WriteString(fmt.Sprintf("%v", _m.GroupIds))

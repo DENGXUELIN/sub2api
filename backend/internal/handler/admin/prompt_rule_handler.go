@@ -20,27 +20,31 @@ func NewPromptRuleHandler(service *service.PromptRuleService) *PromptRuleHandler
 }
 
 type CreatePromptRuleRequest struct {
-	Name        string   `json:"name" binding:"required"`
-	Description *string  `json:"description"`
-	Enabled     *bool    `json:"enabled"`
-	Order       int      `json:"order"`
-	Role        string   `json:"role"`
-	Content     string   `json:"content" binding:"required"`
-	Action      string   `json:"action"`
-	GroupIDs    []int64  `json:"group_ids"`
-	ModelIDs    []string `json:"model_ids"`
+	Name         string   `json:"name" binding:"required"`
+	Description  *string  `json:"description"`
+	Enabled      *bool    `json:"enabled"`
+	Order        int      `json:"order"`
+	Role         string   `json:"role"`
+	Content      string   `json:"content" binding:"required"`
+	Action       string   `json:"action"`
+	MatchPattern string   `json:"match_pattern"`
+	MatchMode    string   `json:"match_mode"`
+	GroupIDs     []int64  `json:"group_ids"`
+	ModelIDs     []string `json:"model_ids"`
 }
 
 type UpdatePromptRuleRequest struct {
-	Name        *string  `json:"name"`
-	Description *string  `json:"description"`
-	Enabled     *bool    `json:"enabled"`
-	Order       *int     `json:"order"`
-	Role        *string  `json:"role"`
-	Content     *string  `json:"content"`
-	Action      *string  `json:"action"`
-	GroupIDs    []int64  `json:"group_ids"`
-	ModelIDs    []string `json:"model_ids"`
+	Name         *string  `json:"name"`
+	Description  *string  `json:"description"`
+	Enabled      *bool    `json:"enabled"`
+	Order        *int     `json:"order"`
+	Role         *string  `json:"role"`
+	Content      *string  `json:"content"`
+	Action       *string  `json:"action"`
+	MatchPattern *string  `json:"match_pattern"`
+	MatchMode    *string  `json:"match_mode"`
+	GroupIDs     []int64  `json:"group_ids"`
+	ModelIDs     []string `json:"model_ids"`
 }
 
 // List GET /api/v1/admin/prompt-rules
@@ -97,9 +101,10 @@ func (h *PromptRuleHandler) Create(c *gin.Context) {
 	}
 
 	rule := &model.PromptRule{
-		Name:    req.Name,
-		Content: req.Content,
-		Order:   req.Order,
+		Name:         req.Name,
+		Content:      req.Content,
+		Order:        req.Order,
+		MatchPattern: req.MatchPattern,
 	}
 
 	if req.Enabled != nil {
@@ -116,6 +121,11 @@ func (h *PromptRuleHandler) Create(c *gin.Context) {
 		rule.Action = req.Action
 	} else {
 		rule.Action = model.PromptActionPrepend
+	}
+	if req.MatchMode != "" {
+		rule.MatchMode = req.MatchMode
+	} else {
+		rule.MatchMode = model.PromptMatchModePlain
 	}
 	rule.Description = req.Description
 	if req.GroupIDs != nil {
@@ -166,16 +176,18 @@ func (h *PromptRuleHandler) Update(c *gin.Context) {
 	}
 
 	rule := &model.PromptRule{
-		ID:          id,
-		Name:        existing.Name,
-		Description: existing.Description,
-		Enabled:     existing.Enabled,
-		Order:       existing.Order,
-		Role:        existing.Role,
-		Content:     existing.Content,
-		Action:      existing.Action,
-		GroupIDs:    existing.GroupIDs,
-		ModelIDs:    existing.ModelIDs,
+		ID:           id,
+		Name:         existing.Name,
+		Description:  existing.Description,
+		Enabled:      existing.Enabled,
+		Order:        existing.Order,
+		Role:         existing.Role,
+		Content:      existing.Content,
+		Action:       existing.Action,
+		MatchPattern: existing.MatchPattern,
+		MatchMode:    existing.MatchMode,
+		GroupIDs:     existing.GroupIDs,
+		ModelIDs:     existing.ModelIDs,
 	}
 
 	if req.Name != nil {
@@ -198,6 +210,12 @@ func (h *PromptRuleHandler) Update(c *gin.Context) {
 	}
 	if req.Action != nil {
 		rule.Action = *req.Action
+	}
+	if req.MatchPattern != nil {
+		rule.MatchPattern = *req.MatchPattern
+	}
+	if req.MatchMode != nil {
+		rule.MatchMode = *req.MatchMode
 	}
 	if req.GroupIDs != nil {
 		rule.GroupIDs = req.GroupIDs

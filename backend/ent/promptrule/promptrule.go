@@ -31,6 +31,10 @@ const (
 	FieldContent = "content"
 	// FieldAction holds the string denoting the action field in the database.
 	FieldAction = "action"
+	// FieldMatchPattern holds the string denoting the match_pattern field in the database.
+	FieldMatchPattern = "match_pattern"
+	// FieldMatchMode holds the string denoting the match_mode field in the database.
+	FieldMatchMode = "match_mode"
 	// FieldGroupIds holds the string denoting the group_ids field in the database.
 	FieldGroupIds = "group_ids"
 	// FieldModelIds holds the string denoting the model_ids field in the database.
@@ -51,6 +55,8 @@ var Columns = []string{
 	FieldRole,
 	FieldContent,
 	FieldAction,
+	FieldMatchPattern,
+	FieldMatchMode,
 	FieldGroupIds,
 	FieldModelIds,
 }
@@ -88,6 +94,10 @@ var (
 	DefaultAction string
 	// ActionValidator is a validator for the "action" field. It is called by the builders before save.
 	ActionValidator func(string) error
+	// DefaultMatchMode holds the default value on creation for the "match_mode" field.
+	DefaultMatchMode string
+	// MatchModeValidator is a validator for the "match_mode" field. It is called by the builders before save.
+	MatchModeValidator func(string) error
 )
 
 // OrderOption defines the ordering options for the PromptRule queries.
@@ -141,4 +151,14 @@ func ByContent(opts ...sql.OrderTermOption) OrderOption {
 // ByAction orders the results by the action field.
 func ByAction(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldAction, opts...).ToFunc()
+}
+
+// ByMatchPattern orders the results by the match_pattern field.
+func ByMatchPattern(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldMatchPattern, opts...).ToFunc()
+}
+
+// ByMatchMode orders the results by the match_mode field.
+func ByMatchMode(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldMatchMode, opts...).ToFunc()
 }

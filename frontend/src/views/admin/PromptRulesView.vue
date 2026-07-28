@@ -197,7 +197,11 @@
             <label class="input-label">{{
               t("admin.promptRules.fields.role")
             }}</label>
-            <Select v-model="form.role" :options="roleOptions" />
+            <Select
+              v-model="form.role"
+              :options="roleOptions"
+              :disabled="form.action === 'replace'"
+            />
           </div>
           <div>
             <label class="input-label">{{
@@ -215,6 +219,33 @@
         <p class="text-xs text-gray-500 dark:text-dark-400">
           {{ t(`admin.promptRules.fields.actionHelp.${form.role}`) }}
         </p>
+        <template v-if="form.action === 'replace'">
+          <div>
+            <div class="mb-1 flex items-center gap-2">
+              <label class="input-label mb-0">{{
+                t("admin.promptRules.fields.matchPattern")
+              }}</label>
+              <label class="flex items-center gap-1 text-xs text-gray-500 dark:text-dark-400">
+                <input
+                  type="checkbox"
+                  :checked="form.match_mode === 'regex'"
+                  @change="form.match_mode = ($event.target as HTMLInputElement).checked ? 'regex' : 'plain'"
+                  class="h-3.5 w-3.5 rounded border-gray-300"
+                />
+                {{ t("admin.promptRules.fields.matchModeRegex") }}
+              </label>
+            </div>
+            <textarea
+              v-model="form.match_pattern"
+              rows="4"
+              class="input font-mono text-sm"
+              :placeholder="t('admin.promptRules.fields.matchPatternPlaceholder')"
+            />
+            <p class="mt-1 text-xs text-gray-500 dark:text-dark-400">
+              {{ t("admin.promptRules.fields.matchModeHelp") }}
+            </p>
+          </div>
+        </template>
         <div>
           <label class="input-label">{{
             t("admin.promptRules.fields.content")
@@ -330,23 +361,41 @@ const form = reactive({
   description: "",
   enabled: true,
   role: "system" as PromptRule["role"],
-  action: "prepend" as "prepend" | "append",
+  action: "prepend" as "prepend" | "append" | "replace",
   order: 0,
   content: "",
+  match_pattern: "",
+  match_mode: "plain" as "plain" | "regex",
   groupIds: [] as number[],
   modelIds: [] as string[],
 });
 
-const roleOptions = computed(() => [
-  { value: "system", label: t("admin.promptRules.roleLabel.system") },
-  { value: "user", label: t("admin.promptRules.roleLabel.user") },
-  { value: "assistant", label: t("admin.promptRules.roleLabel.assistant") },
-]);
+const roleOptions = computed(() => {
+  const options = [
+    { value: "system", label: t("admin.promptRules.roleLabel.system") },
+    { value: "user", label: t("admin.promptRules.roleLabel.user") },
+    { value: "assistant", label: t("admin.promptRules.roleLabel.assistant") },
+  ];
+  if (form.action === "replace") {
+    return options.filter((option) => option.value === "system");
+  }
+  return options;
+});
 
 const actionOptions = computed(() => [
   { value: "prepend", label: t("admin.promptRules.actionLabel.prepend") },
   { value: "append", label: t("admin.promptRules.actionLabel.append") },
+  { value: "replace", label: t("admin.promptRules.actionLabel.replace") },
 ]);
+
+watch(
+  () => form.action,
+  (action) => {
+    if (action === "replace") {
+      form.role = "system";
+    }
+  },
+);
 
 const columns = computed<Column[]>(() => [
   { key: "order", label: t("admin.promptRules.columns.order"), sortable: true },
@@ -408,6 +457,8 @@ function resetForm() {
   form.action = "prepend";
   form.order = 0;
   form.content = "";
+  form.match_pattern = "";
+  form.match_mode = "plain";
   form.groupIds = [];
   form.modelIds = [];
 }
@@ -507,6 +558,8 @@ function openEdit(rule: PromptRule) {
   form.action = rule.action;
   form.order = rule.order;
   form.content = rule.content;
+  form.match_pattern = rule.match_pattern || "";
+  form.match_mode = rule.match_mode || "plain";
   form.groupIds = [...rule.group_ids];
   form.modelIds = [...rule.model_ids];
   showDialog.value = true;
@@ -524,7 +577,7 @@ async function saveRule() {
   }
   saving.value = true;
   try {
-    const payload = {
+    const base = {
       name: form.name,
       description: form.description || null,
       enabled: form.enabled,
@@ -534,11 +587,14 @@ async function saveRule() {
       content: form.content,
       group_ids: form.groupIds,
       model_ids: form.modelIds,
+      ...(form.action === "replace"
+        ? { match_pattern: form.match_pattern, match_mode: form.match_mode }
+        : {}),
     };
     if (editingRule.value) {
-      await promptRuleAPI.update(editingRule.value.id, payload);
+      await promptRuleAPI.update(editingRule.value.id, base);
     } else {
-      await promptRuleAPI.create(payload);
+      await promptRuleAPI.create(base);
     }
     appStore.showSuccess(t("common.success"));
     closeDialog();

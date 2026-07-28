@@ -17,12 +17,12 @@ func injectMatchingPromptRules(
 		return body
 	}
 
-	prepend, appendRules := promptRuleService.GetMatchingRules(groupID, model)
-	if len(prepend) == 0 && len(appendRules) == 0 {
+	prepend, appendRules, replaceRules := promptRuleService.GetMatchingRules(groupID, model)
+	if len(prepend) == 0 && len(appendRules) == 0 && len(replaceRules) == 0 {
 		return body
 	}
 
-	result := service.InjectPromptRules(protocol, body, prepend, appendRules)
+	result := service.InjectPromptRules(protocol, body, prepend, appendRules, replaceRules)
 	if reqLog != nil {
 		for _, skipped := range result.Skipped {
 			reqLog.Warn("prompt_rule.skipped",

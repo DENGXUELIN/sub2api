@@ -29,6 +29,7 @@ export default {
     actionLabel: {
       prepend: "Prepend to Content",
       append: "Append to Content",
+      replace: "Replace Content",
     },
     columns: {
       order: "Order",
@@ -57,6 +58,12 @@ export default {
       order: "Order",
       content: "Prompt Content",
       contentPlaceholder: "Enter the prompt content to apply...",
+      matchPattern: "Match Pattern",
+      matchPatternPlaceholder: "Text to find and replace...",
+      matchMode: "Match Mode",
+      matchModePlain: "Plain Text",
+      matchModeRegex: "Regex",
+      matchModeHelp: "Plain: exact substring match. Regex: Go regexp syntax (RE2).",
       groupIds: "Target Groups",
       modelIds: "Model Restriction (Optional)",
     },

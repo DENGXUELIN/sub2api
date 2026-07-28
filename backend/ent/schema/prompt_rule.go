@@ -55,6 +55,15 @@ func (PromptRule) Fields() []ent.Field {
 			MaxLen(10).
 			Default("prepend"),
 
+		field.Text("match_pattern").
+			Optional().
+			Nillable(),
+
+		field.String("match_mode").
+			MaxLen(10).
+			Default("plain").
+			Optional(),
+
 		field.JSON("group_ids", []int64{}).
 			Optional().
 			SchemaType(map[string]string{dialect.Postgres: "jsonb"}),

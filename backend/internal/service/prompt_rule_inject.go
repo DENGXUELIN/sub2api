@@ -3,6 +3,7 @@ package service
 import (
 	"encoding/json"
 	"fmt"
+	"regexp"
 	"strings"
 
 	"github.com/Wei-Shaw/sub2api/internal/model"
@@ -31,43 +32,56 @@ type PromptRuleInjectionResult struct {
 	Skipped []PromptRuleSkip
 }
 
-func InjectPromptRules(protocol PromptRuleProtocol, body []byte, prepend, appendRules []*model.PromptRule) PromptRuleInjectionResult {
+func InjectPromptRules(protocol PromptRuleProtocol, body []byte, prepend, appendRules, replaceRules []*model.PromptRule) PromptRuleInjectionResult {
 	switch protocol {
 	case PromptRuleProtocolOpenAIChat:
-		return InjectPromptRulesOpenAIChat(body, prepend, appendRules)
+		return InjectPromptRulesOpenAIChat(body, prepend, appendRules, replaceRules)
 	case PromptRuleProtocolOpenAIResponses:
-		return InjectPromptRulesOpenAIResponses(body, prepend, appendRules)
+		return InjectPromptRulesOpenAIResponses(body, prepend, appendRules, replaceRules)
 	case PromptRuleProtocolAnthropic:
-		return InjectPromptRulesAnthropic(body, prepend, appendRules)
+		return InjectPromptRulesAnthropic(body, prepend, appendRules, replaceRules)
 	case PromptRuleProtocolGemini:
-		return InjectPromptRulesGemini(body, prepend, appendRules)
+		return InjectPromptRulesGemini(body, prepend, appendRules, replaceRules)
 	default:
 		return PromptRuleInjectionResult{Body: body}
 	}
 }
 
-func InjectPromptRulesOpenAIChat(body []byte, prepend, appendRules []*model.PromptRule) PromptRuleInjectionResult {
-	return injectMessageArrayProtocol(body, "messages", PromptRuleProtocolOpenAIChat, prepend, appendRules)
+func InjectPromptRulesOpenAIChat(body []byte, prepend, appendRules, replaceRules []*model.PromptRule) PromptRuleInjectionResult {
+	result := applyReplaceRulesToMessages(body, "messages", replaceRules)
+	msgResult := injectMessageArrayProtocol(result.Body, "messages", PromptRuleProtocolOpenAIChat, prepend, appendRules)
+	result.Body = msgResult.Body
+	result.Skipped = append(result.Skipped, msgResult.Skipped...)
+	return result
 }
 
-func InjectPromptRulesAnthropic(body []byte, prepend, appendRules []*model.PromptRule) PromptRuleInjectionResult {
-	result := injectAnthropicSystemRules(body, prepend, appendRules)
+func InjectPromptRulesAnthropic(body []byte, prepend, appendRules, replaceRules []*model.PromptRule) PromptRuleInjectionResult {
+	result := applyReplaceRulesToAnthropicSystem(body, replaceRules)
+	sysResult := injectAnthropicSystemRules(result.Body, prepend, appendRules)
+	result.Body = sysResult.Body
+	result.Skipped = append(result.Skipped, sysResult.Skipped...)
 	messageResult := injectMessageArrayProtocol(result.Body, "messages", PromptRuleProtocolAnthropic, prepend, appendRules)
 	result.Body = messageResult.Body
 	result.Skipped = append(result.Skipped, messageResult.Skipped...)
 	return result
 }
 
-func InjectPromptRulesGemini(body []byte, prepend, appendRules []*model.PromptRule) PromptRuleInjectionResult {
-	result := injectGeminiSystemRules(body, prepend, appendRules)
+func InjectPromptRulesGemini(body []byte, prepend, appendRules, replaceRules []*model.PromptRule) PromptRuleInjectionResult {
+	result := applyReplaceRulesToGeminiSystem(body, replaceRules)
+	sysResult := injectGeminiSystemRules(result.Body, prepend, appendRules)
+	result.Body = sysResult.Body
+	result.Skipped = append(result.Skipped, sysResult.Skipped...)
 	messageResult := injectMessageArrayProtocol(result.Body, "contents", PromptRuleProtocolGemini, prepend, appendRules)
 	result.Body = messageResult.Body
 	result.Skipped = append(result.Skipped, messageResult.Skipped...)
 	return result
 }
 
-func InjectPromptRulesOpenAIResponses(body []byte, prepend, appendRules []*model.PromptRule) PromptRuleInjectionResult {
-	result := injectResponsesSystemRules(body, prepend, appendRules)
+func InjectPromptRulesOpenAIResponses(body []byte, prepend, appendRules, replaceRules []*model.PromptRule) PromptRuleInjectionResult {
+	result := applyReplaceRulesToResponsesSystem(body, replaceRules)
+	sysResult := injectResponsesSystemRules(result.Body, prepend, appendRules)
+	result.Body = sysResult.Body
+	result.Skipped = append(result.Skipped, sysResult.Skipped...)
 	prependByRole, appendByRole := nonSystemRulesByRole(prepend, appendRules)
 	if len(prependByRole) == 0 && len(appendByRole) == 0 {
 		return result
@@ -503,4 +517,281 @@ func rawAnthropicTextBlock(content string) json.RawMessage {
 func rawGeminiTextPart(content string) json.RawMessage {
 	value, _ := json.Marshal(map[string]string{"text": content})
 	return value
+}
+
+// applyReplaceRules applies replace rules to a text string, supporting plain and regex modes.
+// matched maps rule ID -> whether that rule matched in this text.
+// skipped only includes hard failures (e.g. invalid regex); "not found" is tracked by callers.
+func applyReplaceRules(text string, rules []*model.PromptRule) (string, map[int64]bool, []PromptRuleSkip) {
+	if len(rules) == 0 {
+		return text, nil, nil
+	}
+	systemRules := rulesForRole(rules, model.PromptRoleSystem)
+	if len(systemRules) == 0 {
+		return text, nil, nil
+	}
+	matched := make(map[int64]bool, len(systemRules))
+	var skipped []PromptRuleSkip
+	for _, rule := range systemRules {
+		if rule.MatchPattern == "" {
+			continue
+		}
+		original := text
+		switch rule.MatchMode {
+		case model.PromptMatchModeRegex:
+			re, err := regexp.Compile(rule.MatchPattern)
+			if err != nil {
+				// Mark as "handled" so callers don't also report "not found".
+				matched[rule.ID] = true
+				skipped = append(skipped, PromptRuleSkip{
+					RuleID: rule.ID, Role: rule.Role, Action: rule.Action,
+					Reason: "invalid regex: " + err.Error(),
+				})
+				continue
+			}
+			text = re.ReplaceAllString(text, rule.Content)
+		default:
+			text = strings.ReplaceAll(text, rule.MatchPattern, rule.Content)
+		}
+		if text != original {
+			matched[rule.ID] = true
+		}
+	}
+	return text, matched, skipped
+}
+
+func mergeMatched(dst map[int64]bool, src map[int64]bool) {
+	for id, ok := range src {
+		if ok {
+			dst[id] = true
+		}
+	}
+}
+
+func skipsForUnmatchedReplaceRules(rules []*model.PromptRule, matched map[int64]bool) []PromptRuleSkip {
+	systemRules := rulesForRole(rules, model.PromptRoleSystem)
+	skips := make([]PromptRuleSkip, 0)
+	for _, rule := range systemRules {
+		if rule.MatchPattern == "" {
+			continue
+		}
+		if !matched[rule.ID] {
+			skips = append(skips, PromptRuleSkip{
+				RuleID: rule.ID, Role: rule.Role, Action: rule.Action,
+				Reason: "match_pattern not found in text",
+			})
+		}
+	}
+	return skips
+}
+
+// applyReplaceRulesToAnthropicSystem applies replace rules to Anthropic's system array (text blocks).
+func applyReplaceRulesToAnthropicSystem(body []byte, replaceRules []*model.PromptRule) PromptRuleInjectionResult {
+	result := PromptRuleInjectionResult{Body: body}
+	systemRules := rulesForRole(replaceRules, model.PromptRoleSystem)
+	if len(systemRules) == 0 {
+		return result
+	}
+
+	system := gjson.GetBytes(body, "system")
+	if !system.Exists() {
+		return result
+	}
+
+	if system.Type == gjson.String {
+		newText, matched, skipped := applyReplaceRules(system.String(), replaceRules)
+		result.Skipped = append(result.Skipped, skipped...)
+		result.Skipped = append(result.Skipped, skipsForUnmatchedReplaceRules(replaceRules, matched)...)
+		updated, err := sjson.SetBytes(body, "system", newText)
+		if err == nil {
+			result.Body = updated
+		}
+		return result
+	}
+
+	if !system.IsArray() {
+		return result
+	}
+
+	items := rawArray(system)
+	modified := false
+	matched := make(map[int64]bool)
+	for i, item := range items {
+		itemType := gjson.GetBytes(item, "type").String()
+		if itemType != "text" {
+			continue
+		}
+		text := gjson.GetBytes(item, "text").String()
+		newText, localMatched, skipped := applyReplaceRules(text, replaceRules)
+		result.Skipped = append(result.Skipped, skipped...)
+		mergeMatched(matched, localMatched)
+		if newText != text {
+			updated, err := sjson.SetBytes(item, "text", newText)
+			if err == nil {
+				items[i] = updated
+				modified = true
+			}
+		}
+	}
+	result.Skipped = append(result.Skipped, skipsForUnmatchedReplaceRules(replaceRules, matched)...)
+	if modified {
+		encoded, err := json.Marshal(items)
+		if err == nil {
+			updated, err := sjson.SetRawBytes(body, "system", encoded)
+			if err == nil {
+				result.Body = updated
+			}
+		}
+	}
+	return result
+}
+
+// applyReplaceRulesToMessages applies replace rules to system messages in OpenAI chat format.
+func applyReplaceRulesToMessages(body []byte, messagesKey string, replaceRules []*model.PromptRule) PromptRuleInjectionResult {
+	result := PromptRuleInjectionResult{Body: body}
+	systemRules := rulesForRole(replaceRules, model.PromptRoleSystem)
+	if len(systemRules) == 0 {
+		return result
+	}
+
+	messages := gjson.GetBytes(body, messagesKey)
+	if !messages.IsArray() {
+		return result
+	}
+
+	items := rawArray(messages)
+	modified := false
+	matched := make(map[int64]bool)
+	for i, item := range items {
+		role := gjson.GetBytes(item, "role").String()
+		if role != "system" {
+			continue
+		}
+		content := gjson.GetBytes(item, "content")
+		if content.Type == gjson.String {
+			newText, localMatched, skipped := applyReplaceRules(content.String(), replaceRules)
+			result.Skipped = append(result.Skipped, skipped...)
+			mergeMatched(matched, localMatched)
+			if newText != content.String() {
+				updated, err := sjson.SetBytes(item, "content", newText)
+				if err == nil {
+					items[i] = updated
+					modified = true
+				}
+			}
+			continue
+		}
+		if !content.IsArray() {
+			continue
+		}
+		parts := rawArray(content)
+		partsModified := false
+		for j, part := range parts {
+			text := gjson.GetBytes(part, "text")
+			if text.Type != gjson.String {
+				continue
+			}
+			newText, localMatched, skipped := applyReplaceRules(text.String(), replaceRules)
+			result.Skipped = append(result.Skipped, skipped...)
+			mergeMatched(matched, localMatched)
+			if newText != text.String() {
+				updated, err := sjson.SetBytes(part, "text", newText)
+				if err == nil {
+					parts[j] = updated
+					partsModified = true
+				}
+			}
+		}
+		if partsModified {
+			encodedParts, err := json.Marshal(parts)
+			if err == nil {
+				updated, err := sjson.SetRawBytes(item, "content", encodedParts)
+				if err == nil {
+					items[i] = updated
+					modified = true
+				}
+			}
+		}
+	}
+	result.Skipped = append(result.Skipped, skipsForUnmatchedReplaceRules(replaceRules, matched)...)
+	if modified {
+		encoded, err := json.Marshal(items)
+		if err == nil {
+			updated, err := sjson.SetRawBytes(body, messagesKey, encoded)
+			if err == nil {
+				result.Body = updated
+			}
+		}
+	}
+	return result
+}
+
+// applyReplaceRulesToGeminiSystem applies replace rules to Gemini's systemInstruction.parts.
+func applyReplaceRulesToGeminiSystem(body []byte, replaceRules []*model.PromptRule) PromptRuleInjectionResult {
+	result := PromptRuleInjectionResult{Body: body}
+	systemRules := rulesForRole(replaceRules, model.PromptRoleSystem)
+	if len(systemRules) == 0 {
+		return result
+	}
+
+	parts := gjson.GetBytes(body, "systemInstruction.parts")
+	if !parts.IsArray() {
+		return result
+	}
+
+	items := rawArray(parts)
+	modified := false
+	matched := make(map[int64]bool)
+	for i, item := range items {
+		text := gjson.GetBytes(item, "text")
+		if !text.Exists() {
+			continue
+		}
+		newText, localMatched, skipped := applyReplaceRules(text.String(), replaceRules)
+		result.Skipped = append(result.Skipped, skipped...)
+		mergeMatched(matched, localMatched)
+		if newText != text.String() {
+			updated, err := sjson.SetBytes(item, "text", newText)
+			if err == nil {
+				items[i] = updated
+				modified = true
+			}
+		}
+	}
+	result.Skipped = append(result.Skipped, skipsForUnmatchedReplaceRules(replaceRules, matched)...)
+	if modified {
+		encoded, err := json.Marshal(items)
+		if err == nil {
+			updated, err := sjson.SetRawBytes(body, "systemInstruction.parts", encoded)
+			if err == nil {
+				result.Body = updated
+			}
+		}
+	}
+	return result
+}
+
+// applyReplaceRulesToResponsesSystem applies replace rules to OpenAI Responses instructions field.
+func applyReplaceRulesToResponsesSystem(body []byte, replaceRules []*model.PromptRule) PromptRuleInjectionResult {
+	result := PromptRuleInjectionResult{Body: body}
+	systemRules := rulesForRole(replaceRules, model.PromptRoleSystem)
+	if len(systemRules) == 0 {
+		return result
+	}
+
+	instructions := gjson.GetBytes(body, "instructions")
+	if !instructions.Exists() || instructions.Type != gjson.String {
+		return result
+	}
+
+	newText, matched, skipped := applyReplaceRules(instructions.String(), replaceRules)
+	result.Skipped = append(result.Skipped, skipped...)
+	result.Skipped = append(result.Skipped, skipsForUnmatchedReplaceRules(replaceRules, matched)...)
+	if newText != instructions.String() {
+		updated, err := sjson.SetBytes(body, "instructions", newText)
+		if err == nil {
+			result.Body = updated
+		}
+	}
+	return result
 }

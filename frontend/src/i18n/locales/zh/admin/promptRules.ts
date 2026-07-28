@@ -27,6 +27,7 @@ export default {
     actionLabel: {
       prepend: "内容前置",
       append: "内容后置",
+      replace: "替换内容",
     },
     columns: {
       order: "顺序",
@@ -55,6 +56,12 @@ export default {
       order: "顺序",
       content: "提示词内容",
       contentPlaceholder: "输入要应用的提示词内容...",
+      matchPattern: "匹配文本",
+      matchPatternPlaceholder: "要查找替换的文本...",
+      matchMode: "匹配模式",
+      matchModePlain: "纯文本",
+      matchModeRegex: "正则表达式",
+      matchModeHelp: "纯文本：精确子串匹配。正则：Go regexp 语法（RE2）。",
       groupIds: "适用分组",
       modelIds: "模型限制（可选）",
     },
