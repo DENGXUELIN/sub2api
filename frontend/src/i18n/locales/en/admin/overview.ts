@@ -952,6 +952,8 @@ export default {
       kiroCache: {
         description: 'Simulate Anthropic prompt cache usage for this Kiro group only.',
         enabled: 'Enable cache emulation',
+        forceCreation: 'Force cache creation',
+        forceCreationHint: 'When clients omit cache_control, add a cache breakpoint only after the prompt meets the official token threshold.',
         endpointMode: 'Kiro inference endpoint',
         endpointModeAuto: 'Auto (switch Q/KRS on 429)',
         endpointModeHint: 'q = AWS Q (shared rate-limit pool with other tools); krs = Kiro native gateway (separate pool); auto = Q first, auto-switch to KRS on 429.',
