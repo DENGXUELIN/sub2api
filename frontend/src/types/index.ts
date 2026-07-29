@@ -1482,6 +1482,7 @@ export interface AdminDataAccount {
   proxy_key?: string | null
   concurrency: number
   priority: number
+  group_ids?: number[]
   rate_multiplier?: number | null
   expires_at?: number | null
   auto_pause_on_expired?: boolean
