@@ -10,6 +10,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"net/http"
 	"net/url"
 	"os"
 	"path/filepath"
@@ -25,6 +26,7 @@ import (
 var (
 	ErrNoUpdateAvailable         = infraerrors.Conflict("ALREADY_UP_TO_DATE", "no update available; current version is latest")
 	ErrRollbackVersionNotAllowed = infraerrors.BadRequest("ROLLBACK_VERSION_NOT_ALLOWED", "version is not in the allowed rollback list")
+	ErrUpdateAssetUnavailable    = infraerrors.New(http.StatusUnprocessableEntity, "UPDATE_ASSET_UNAVAILABLE", "release does not include a compatible update package; use the Docker image or manual deployment")
 )
 
 const (
@@ -194,7 +196,10 @@ func (s *UpdateService) applyReleaseAssets(ctx context.Context, releaseAssets []
 	}
 
 	if downloadURL == "" {
-		return fmt.Errorf("no compatible release found for %s/%s", runtime.GOOS, runtime.GOARCH)
+		return ErrUpdateAssetUnavailable.WithMetadata(map[string]string{
+			"os":   runtime.GOOS,
+			"arch": runtime.GOARCH,
+		})
 	}
 
 	// SECURITY: Validate download URL is from trusted domain

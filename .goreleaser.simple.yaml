@@ -26,12 +26,20 @@ builds:
       - -X main.Date={{.Date}}
       - -X main.BuildType=release
 
-# 跳过 archives
-archives: []
+# Keep the updater-compatible Linux archive while limiting the build matrix.
+archives:
+  - id: default
+    format: tar.gz
+    name_template: >-
+      {{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}
+    files:
+      - LICENSE*
+      - README*
 
-# 跳过 checksum
+# The in-app updater verifies this checksum before replacing the binary.
 checksum:
-  disable: true
+  name_template: 'checksums.txt'
+  algorithm: sha256
 
 changelog:
   disable: true
@@ -65,11 +73,9 @@ release:
   draft: false
   prerelease: auto
   name_template: "Sub2API {{.Version}} (Simple)"
-  # 跳过上传二进制包
-  skip_upload: true
   header: |
     > AI API Gateway Platform - 将 AI 订阅配额分发和管理
-    > ⚡ Simple Release: 仅包含 x86_64 GHCR 镜像
+    > ⚡ Simple Release: x86_64 GHCR 镜像和 Linux x86_64 更新包
 
     {{ .Env.TAG_MESSAGE }}
 

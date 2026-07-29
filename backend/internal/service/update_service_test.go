@@ -5,9 +5,12 @@ package service
 import (
 	"context"
 	"errors"
+	"net/http"
+	"runtime"
 	"testing"
 	"time"
 
+	infraerrors "github.com/Wei-Shaw/sub2api/internal/pkg/errors"
 	"github.com/stretchr/testify/require"
 )
 
@@ -205,5 +208,9 @@ func TestUpdateServiceRollbackToVersionAcceptsVPrefix(t *testing.T) {
 
 	require.Error(t, err)
 	require.NotErrorIs(t, err, ErrRollbackVersionNotAllowed)
-	require.Contains(t, err.Error(), "no compatible release found")
+	require.ErrorIs(t, err, ErrUpdateAssetUnavailable)
+	require.Equal(t, http.StatusUnprocessableEntity, infraerrors.Code(err))
+	require.Equal(t, "UPDATE_ASSET_UNAVAILABLE", infraerrors.Reason(err))
+	require.Equal(t, runtime.GOOS, infraerrors.FromError(err).Metadata["os"])
+	require.Equal(t, runtime.GOARCH, infraerrors.FromError(err).Metadata["arch"])
 }
