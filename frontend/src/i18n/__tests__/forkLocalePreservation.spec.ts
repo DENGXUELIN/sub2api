@@ -115,8 +115,6 @@ admin.groups.kiroCache.endpointModeAuto
 admin.groups.kiroCache.endpointModeHint
 admin.groups.kiroCache.endpointModeKRS
 admin.groups.kiroCache.endpointModeQ
-admin.groups.kiroCache.forceCreation
-admin.groups.kiroCache.forceCreationHint
 admin.groups.kiroCache.ratio
 admin.groups.kiroCache.ratioHint
 admin.groups.kiroCache.stickyRouting
@@ -135,8 +133,8 @@ home.providers.kiro
 `.trim().split(/\s+/)
 
 const expectedHashes = {
-  en: 'a4ff9327e7b2fdca1fb7374a21ce39c1f78157463aa3002adcc952ce9b2f83a1',
-  zh: '1d11a769ecdb77f4adb73b865abaaca0ed9924f732d8b4a2ea4c0cca1b58e7af',
+  en: '2a496c2c86e420c035d4b808ff1fbd008ed89508aad6b613a4fbeee7ed88a8a1',
+  zh: 'eca157af58e66d9cd040405dd30bb1702d1b059052e488a4db1e69659706b492',
 }
 
 function localeValue(locale: Record<string, unknown>, key: string): unknown {
@@ -159,7 +157,7 @@ describe.each([
   ['zh', zh, expectedHashes.zh],
 ] as const)('fork locale preservation: %s', (_name, locale, expectedHash) => {
   it('keeps every fork-added key', () => {
-    expect(preservedForkKeys).toHaveLength(126)
+    expect(preservedForkKeys).toHaveLength(124)
     expect(preservedForkKeys.filter((key) => localeValue(locale, key) === undefined)).toEqual([])
   })
 

@@ -941,20 +941,6 @@ func (_u *GroupUpdate) SetNillableKiroCacheEmulationEnabled(v *bool) *GroupUpdat
 	return _u
 }
 
-// SetKiroCacheForceCreationEnabled sets the "kiro_cache_force_creation_enabled" field.
-func (_u *GroupUpdate) SetKiroCacheForceCreationEnabled(v bool) *GroupUpdate {
-	_u.mutation.SetKiroCacheForceCreationEnabled(v)
-	return _u
-}
-
-// SetNillableKiroCacheForceCreationEnabled sets the "kiro_cache_force_creation_enabled" field if the given value is not nil.
-func (_u *GroupUpdate) SetNillableKiroCacheForceCreationEnabled(v *bool) *GroupUpdate {
-	if v != nil {
-		_u.SetKiroCacheForceCreationEnabled(*v)
-	}
-	return _u
-}
-
 // SetKiroAutoStickyEnabled sets the "kiro_auto_sticky_enabled" field.
 func (_u *GroupUpdate) SetKiroAutoStickyEnabled(v bool) *GroupUpdate {
 	_u.mutation.SetKiroAutoStickyEnabled(v)
@@ -1638,9 +1624,6 @@ func (_u *GroupUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 	}
 	if value, ok := _u.mutation.KiroCacheEmulationEnabled(); ok {
 		_spec.SetField(group.FieldKiroCacheEmulationEnabled, field.TypeBool, value)
-	}
-	if value, ok := _u.mutation.KiroCacheForceCreationEnabled(); ok {
-		_spec.SetField(group.FieldKiroCacheForceCreationEnabled, field.TypeBool, value)
 	}
 	if value, ok := _u.mutation.KiroAutoStickyEnabled(); ok {
 		_spec.SetField(group.FieldKiroAutoStickyEnabled, field.TypeBool, value)
@@ -2890,20 +2873,6 @@ func (_u *GroupUpdateOne) SetNillableKiroCacheEmulationEnabled(v *bool) *GroupUp
 	return _u
 }
 
-// SetKiroCacheForceCreationEnabled sets the "kiro_cache_force_creation_enabled" field.
-func (_u *GroupUpdateOne) SetKiroCacheForceCreationEnabled(v bool) *GroupUpdateOne {
-	_u.mutation.SetKiroCacheForceCreationEnabled(v)
-	return _u
-}
-
-// SetNillableKiroCacheForceCreationEnabled sets the "kiro_cache_force_creation_enabled" field if the given value is not nil.
-func (_u *GroupUpdateOne) SetNillableKiroCacheForceCreationEnabled(v *bool) *GroupUpdateOne {
-	if v != nil {
-		_u.SetKiroCacheForceCreationEnabled(*v)
-	}
-	return _u
-}
-
 // SetKiroAutoStickyEnabled sets the "kiro_auto_sticky_enabled" field.
 func (_u *GroupUpdateOne) SetKiroAutoStickyEnabled(v bool) *GroupUpdateOne {
 	_u.mutation.SetKiroAutoStickyEnabled(v)
@@ -3617,9 +3586,6 @@ func (_u *GroupUpdateOne) sqlSave(ctx context.Context) (_node *Group, err error)
 	}
 	if value, ok := _u.mutation.KiroCacheEmulationEnabled(); ok {
 		_spec.SetField(group.FieldKiroCacheEmulationEnabled, field.TypeBool, value)
-	}
-	if value, ok := _u.mutation.KiroCacheForceCreationEnabled(); ok {
-		_spec.SetField(group.FieldKiroCacheForceCreationEnabled, field.TypeBool, value)
 	}
 	if value, ok := _u.mutation.KiroAutoStickyEnabled(); ok {
 		_spec.SetField(group.FieldKiroAutoStickyEnabled, field.TypeBool, value)

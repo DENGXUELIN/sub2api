@@ -264,12 +264,11 @@ type CreateGroupInput struct {
 	// RPMLimit 分组 RPM 上限（0 = 不限制）
 	RPMLimit int
 	// Kiro 模拟缓存配置（仅 kiro 分组生效）
-	KiroCacheEmulationEnabled     bool
-	KiroCacheForceCreationEnabled bool
-	KiroAutoStickyEnabled         *bool
-	KiroStickySessionTTLSeconds   *int
-	KiroCacheEmulationRatio       *float64
-	KiroEndpointMode              *string
+	KiroCacheEmulationEnabled   bool
+	KiroAutoStickyEnabled       *bool
+	KiroStickySessionTTLSeconds *int
+	KiroCacheEmulationRatio     *float64
+	KiroEndpointMode            *string
 
 	// MaxReasoningEffort OpenAI/Codex 请求的推理强度上限，空字符串表示不限制。
 	MaxReasoningEffort string
@@ -333,12 +332,11 @@ type UpdateGroupInput struct {
 	// RPMLimit 分组 RPM 上限（0 = 不限制），nil 表示未提供不改动。
 	RPMLimit *int
 	// Kiro 模拟缓存配置（仅 kiro 分组生效）
-	KiroCacheEmulationEnabled     *bool
-	KiroCacheForceCreationEnabled *bool
-	KiroAutoStickyEnabled         *bool
-	KiroStickySessionTTLSeconds   *int
-	KiroCacheEmulationRatio       *float64
-	KiroEndpointMode              *string
+	KiroCacheEmulationEnabled   *bool
+	KiroAutoStickyEnabled       *bool
+	KiroStickySessionTTLSeconds *int
+	KiroCacheEmulationRatio     *float64
+	KiroEndpointMode            *string
 
 	// MaxReasoningEffort 空字符串表示清除上限；nil 表示未提供不改动。
 	MaxReasoningEffort *string

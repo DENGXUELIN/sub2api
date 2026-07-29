@@ -21922,7 +21922,6 @@ type GroupMutation struct {
 	rpm_limit                               *int
 	addrpm_limit                            *int
 	kiro_cache_emulation_enabled            *bool
-	kiro_cache_force_creation_enabled       *bool
 	kiro_auto_sticky_enabled                *bool
 	kiro_sticky_session_ttl_seconds         *int
 	addkiro_sticky_session_ttl_seconds      *int
@@ -24545,42 +24544,6 @@ func (m *GroupMutation) ResetKiroCacheEmulationEnabled() {
 	m.kiro_cache_emulation_enabled = nil
 }
 
-// SetKiroCacheForceCreationEnabled sets the "kiro_cache_force_creation_enabled" field.
-func (m *GroupMutation) SetKiroCacheForceCreationEnabled(b bool) {
-	m.kiro_cache_force_creation_enabled = &b
-}
-
-// KiroCacheForceCreationEnabled returns the value of the "kiro_cache_force_creation_enabled" field in the mutation.
-func (m *GroupMutation) KiroCacheForceCreationEnabled() (r bool, exists bool) {
-	v := m.kiro_cache_force_creation_enabled
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldKiroCacheForceCreationEnabled returns the old "kiro_cache_force_creation_enabled" field's value of the Group entity.
-// If the Group object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *GroupMutation) OldKiroCacheForceCreationEnabled(ctx context.Context) (v bool, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldKiroCacheForceCreationEnabled is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldKiroCacheForceCreationEnabled requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldKiroCacheForceCreationEnabled: %w", err)
-	}
-	return oldValue.KiroCacheForceCreationEnabled, nil
-}
-
-// ResetKiroCacheForceCreationEnabled resets all changes to the "kiro_cache_force_creation_enabled" field.
-func (m *GroupMutation) ResetKiroCacheForceCreationEnabled() {
-	m.kiro_cache_force_creation_enabled = nil
-}
-
 // SetKiroAutoStickyEnabled sets the "kiro_auto_sticky_enabled" field.
 func (m *GroupMutation) SetKiroAutoStickyEnabled(b bool) {
 	m.kiro_auto_sticky_enabled = &b
@@ -25364,9 +25327,6 @@ func (m *GroupMutation) Fields() []string {
 	if m.kiro_cache_emulation_enabled != nil {
 		fields = append(fields, group.FieldKiroCacheEmulationEnabled)
 	}
-	if m.kiro_cache_force_creation_enabled != nil {
-		fields = append(fields, group.FieldKiroCacheForceCreationEnabled)
-	}
 	if m.kiro_auto_sticky_enabled != nil {
 		fields = append(fields, group.FieldKiroAutoStickyEnabled)
 	}
@@ -25495,8 +25455,6 @@ func (m *GroupMutation) Field(name string) (ent.Value, bool) {
 		return m.RpmLimit()
 	case group.FieldKiroCacheEmulationEnabled:
 		return m.KiroCacheEmulationEnabled()
-	case group.FieldKiroCacheForceCreationEnabled:
-		return m.KiroCacheForceCreationEnabled()
 	case group.FieldKiroAutoStickyEnabled:
 		return m.KiroAutoStickyEnabled()
 	case group.FieldKiroStickySessionTTLSeconds:
@@ -25620,8 +25578,6 @@ func (m *GroupMutation) OldField(ctx context.Context, name string) (ent.Value, e
 		return m.OldRpmLimit(ctx)
 	case group.FieldKiroCacheEmulationEnabled:
 		return m.OldKiroCacheEmulationEnabled(ctx)
-	case group.FieldKiroCacheForceCreationEnabled:
-		return m.OldKiroCacheForceCreationEnabled(ctx)
 	case group.FieldKiroAutoStickyEnabled:
 		return m.OldKiroAutoStickyEnabled(ctx)
 	case group.FieldKiroStickySessionTTLSeconds:
@@ -25999,13 +25955,6 @@ func (m *GroupMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetKiroCacheEmulationEnabled(v)
-		return nil
-	case group.FieldKiroCacheForceCreationEnabled:
-		v, ok := value.(bool)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetKiroCacheForceCreationEnabled(v)
 		return nil
 	case group.FieldKiroAutoStickyEnabled:
 		v, ok := value.(bool)
@@ -26628,9 +26577,6 @@ func (m *GroupMutation) ResetField(name string) error {
 		return nil
 	case group.FieldKiroCacheEmulationEnabled:
 		m.ResetKiroCacheEmulationEnabled()
-		return nil
-	case group.FieldKiroCacheForceCreationEnabled:
-		m.ResetKiroCacheForceCreationEnabled()
 		return nil
 	case group.FieldKiroAutoStickyEnabled:
 		m.ResetKiroAutoStickyEnabled()

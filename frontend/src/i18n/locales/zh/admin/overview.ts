@@ -885,8 +885,6 @@ export default {
       kiroCache: {
         description: '仅对当前 Kiro 分组模拟 Anthropic Prompt Cache 用量。',
         enabled: '启用模拟缓存',
-        forceCreation: '强制创建缓存',
-        forceCreationHint: '客户端未传 cache_control 时，仅在提示词达到官方 token 阈值后自动补缓存断点。',
         endpointMode: 'Kiro 推理 endpoint',
         endpointModeAuto: '自动切换（429 自动切换 Q/KRS）',
         endpointModeHint: 'q = AWS Q（与其它工具共用限流池）；krs = Kiro 自家网关（独立限流池）；auto = 优先走 Q，遇到 429 自动切换 KRS。',

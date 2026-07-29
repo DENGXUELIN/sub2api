@@ -583,7 +583,6 @@ func (s *adminServiceImpl) CreateGroup(ctx context.Context, input *CreateGroupIn
 		ModelsListConfig:                normalizeGroupModelsListConfig(input.ModelsListConfig),
 		RPMLimit:                        input.RPMLimit,
 		KiroCacheEmulationEnabled:       input.KiroCacheEmulationEnabled,
-		KiroCacheForceCreationEnabled:   input.KiroCacheForceCreationEnabled,
 		KiroAutoStickyEnabled:           kiroAutoStickyEnabled,
 		MaxReasoningEffort:              maxReasoningEffort,
 		ReasoningEffortMappings:         reasoningEffortMappings,
@@ -922,9 +921,6 @@ func (s *adminServiceImpl) UpdateGroup(ctx context.Context, id int64, input *Upd
 	}
 	if input.KiroCacheEmulationEnabled != nil {
 		group.KiroCacheEmulationEnabled = *input.KiroCacheEmulationEnabled
-	}
-	if input.KiroCacheForceCreationEnabled != nil {
-		group.KiroCacheForceCreationEnabled = *input.KiroCacheForceCreationEnabled
 	}
 	if input.KiroAutoStickyEnabled != nil {
 		group.KiroAutoStickyEnabled = *input.KiroAutoStickyEnabled

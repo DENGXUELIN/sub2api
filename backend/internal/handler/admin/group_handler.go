@@ -145,12 +145,11 @@ type CreateGroupRequest struct {
 	// 分组 RPM 上限（0 = 不限制）
 	RPMLimit int `json:"rpm_limit"`
 	// Kiro 模拟缓存配置（仅 kiro 分组生效）
-	KiroCacheEmulationEnabled     bool     `json:"kiro_cache_emulation_enabled"`
-	KiroCacheForceCreationEnabled bool     `json:"kiro_cache_force_creation_enabled"`
-	KiroAutoStickyEnabled         *bool    `json:"kiro_auto_sticky_enabled"`
-	KiroStickySessionTTLSeconds   *int     `json:"kiro_sticky_session_ttl_seconds"`
-	KiroCacheEmulationRatio       *float64 `json:"kiro_cache_emulation_ratio"`
-	KiroEndpointMode              *string  `json:"kiro_endpoint_mode"`
+	KiroCacheEmulationEnabled   bool     `json:"kiro_cache_emulation_enabled"`
+	KiroAutoStickyEnabled       *bool    `json:"kiro_auto_sticky_enabled"`
+	KiroStickySessionTTLSeconds *int     `json:"kiro_sticky_session_ttl_seconds"`
+	KiroCacheEmulationRatio     *float64 `json:"kiro_cache_emulation_ratio"`
+	KiroEndpointMode            *string  `json:"kiro_endpoint_mode"`
 
 	// OpenAI/Codex 请求推理强度上限，空字符串表示不限制。
 	MaxReasoningEffort string `json:"max_reasoning_effort"`
@@ -212,12 +211,11 @@ type UpdateGroupRequest struct {
 	// 分组 RPM 上限（0 = 不限制）；nil 表示未提供不改动
 	RPMLimit *int `json:"rpm_limit"`
 	// Kiro 模拟缓存配置（仅 kiro 分组生效）
-	KiroCacheEmulationEnabled     *bool    `json:"kiro_cache_emulation_enabled"`
-	KiroCacheForceCreationEnabled *bool    `json:"kiro_cache_force_creation_enabled"`
-	KiroAutoStickyEnabled         *bool    `json:"kiro_auto_sticky_enabled"`
-	KiroStickySessionTTLSeconds   *int     `json:"kiro_sticky_session_ttl_seconds"`
-	KiroCacheEmulationRatio       *float64 `json:"kiro_cache_emulation_ratio"`
-	KiroEndpointMode              *string  `json:"kiro_endpoint_mode"`
+	KiroCacheEmulationEnabled   *bool    `json:"kiro_cache_emulation_enabled"`
+	KiroAutoStickyEnabled       *bool    `json:"kiro_auto_sticky_enabled"`
+	KiroStickySessionTTLSeconds *int     `json:"kiro_sticky_session_ttl_seconds"`
+	KiroCacheEmulationRatio     *float64 `json:"kiro_cache_emulation_ratio"`
+	KiroEndpointMode            *string  `json:"kiro_endpoint_mode"`
 
 	// OpenAI/Codex 请求推理强度上限；空字符串清除，nil 不修改。
 	MaxReasoningEffort *string `json:"max_reasoning_effort"`
@@ -554,7 +552,6 @@ func (h *GroupHandler) Create(c *gin.Context) {
 		ModelsListConfig:                req.ModelsListConfig,
 		RPMLimit:                        req.RPMLimit,
 		KiroCacheEmulationEnabled:       req.KiroCacheEmulationEnabled,
-		KiroCacheForceCreationEnabled:   req.KiroCacheForceCreationEnabled,
 		KiroAutoStickyEnabled:           req.KiroAutoStickyEnabled,
 		KiroStickySessionTTLSeconds:     req.KiroStickySessionTTLSeconds,
 		KiroCacheEmulationRatio:         req.KiroCacheEmulationRatio,
@@ -679,7 +676,6 @@ func (h *GroupHandler) Update(c *gin.Context) {
 		ModelsListConfig:                req.ModelsListConfig,
 		RPMLimit:                        req.RPMLimit,
 		KiroCacheEmulationEnabled:       req.KiroCacheEmulationEnabled,
-		KiroCacheForceCreationEnabled:   req.KiroCacheForceCreationEnabled,
 		KiroAutoStickyEnabled:           req.KiroAutoStickyEnabled,
 		KiroStickySessionTTLSeconds:     req.KiroStickySessionTTLSeconds,
 		KiroCacheEmulationRatio:         req.KiroCacheEmulationRatio,
