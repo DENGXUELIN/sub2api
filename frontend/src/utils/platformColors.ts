@@ -48,6 +48,7 @@ const BORDER_STRONG: Record<Platform, string> = {
   openai: 'border-green-500/35 dark:border-green-500/30',
   antigravity: 'border-purple-500/35 dark:border-purple-500/30',
   gemini: 'border-blue-500/35 dark:border-blue-500/30',
+  kiro: 'border-violet-500/35 dark:border-violet-500/30',
   grok: 'border-zinc-800/35 dark:border-zinc-500/35',
   composite: 'border-cyan-500/35 dark:border-cyan-500/30',
 }
@@ -60,6 +61,7 @@ const ACCENT: Record<Platform, string> = {
   openai: '#22c55e', // green-500
   antigravity: '#a855f7', // purple-500
   gemini: '#3b82f6', // blue-500
+  kiro: '#8b5cf6', // violet-500
   grok: '#71717a', // zinc-500
   composite: '#06b6d4', // cyan-500
 }

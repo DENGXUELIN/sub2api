@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest'
 import {
+  platformAccentColor,
   platformBadgeClass,
+  platformBorderStrongClass,
   platformGradientClass,
   platformTextClass
 } from '../platformColors'
@@ -11,6 +13,8 @@ describe('platformColors', () => {
     expect(platformTextClass('kiro')).toContain('violet')
     expect(platformGradientClass('kiro')).toContain('from-violet-500')
     expect(platformGradientClass('kiro')).toContain('to-fuchsia-500')
+    expect(platformBorderStrongClass('kiro')).toContain('violet')
+    expect(platformAccentColor('kiro')).toBe('#8b5cf6')
     expect(platformBadgeClass('kiro')).not.toContain('orange')
   })
 })
