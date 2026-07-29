@@ -420,6 +420,7 @@ func BuildKiroPayloadWithContext(claudeBody []byte, modelID, profileArn, origin 
 			baseSystem = inlineSystem
 		}
 	}
+	baseSystem = normalizeKiroBillingHeader(baseSystem)
 	systemPrompt := buildInjectedSystemPrompt(baseSystem, thinking, toolChoiceHint)
 
 	history, currentUserMsg, currentToolResults := processMessages(filteredMessages, modelID, normalizeOrigin(origin), &requestCtx)
@@ -1289,6 +1290,42 @@ func StreamEventStreamAsAnthropicWithContext(ctx context.Context, body io.Reader
 
 func extractSystemPrompt(claudeBody []byte) string {
 	return extractTextFromContentBlocks(gjson.GetBytes(claudeBody, "system"))
+}
+
+// normalizeKiroBillingHeader removes the per-request Claude Code cache hash.
+// Kiro does not consume this billing field, but its changing value invalidates
+// an otherwise identical upstream prompt prefix.
+func normalizeKiroBillingHeader(content string) string {
+	const (
+		headerMarker = "x-anthropic-billing-header"
+		cacheMarker  = "cch="
+	)
+
+	lower := strings.ToLower(content)
+	headerStart := strings.Index(lower, headerMarker)
+	if headerStart < 0 {
+		return content
+	}
+	lineEnd := strings.IndexByte(content[headerStart:], '\n')
+	if lineEnd < 0 {
+		lineEnd = len(content)
+	} else {
+		lineEnd += headerStart
+	}
+	lineLower := lower[headerStart:lineEnd]
+	cacheStart := strings.Index(lineLower, cacheMarker)
+	if cacheStart < 0 {
+		return content
+	}
+	valueStart := headerStart + cacheStart + len(cacheMarker)
+	valueEnd := lineEnd
+	if end := strings.IndexByte(content[valueStart:lineEnd], ';'); end >= 0 {
+		valueEnd = valueStart + end
+	}
+	if valueStart == valueEnd || content[valueStart:valueEnd] == "0" {
+		return content
+	}
+	return content[:valueStart] + "0" + content[valueEnd:]
 }
 
 // extractTextFromContentBlocks 把 Claude 的 content 字段（字符串或 text block 数组）拼成纯文本。

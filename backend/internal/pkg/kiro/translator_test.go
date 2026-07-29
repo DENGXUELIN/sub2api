@@ -115,6 +115,26 @@ func TestBuildKiroPayloadAlwaysIgnoresClientConversationMetadata(t *testing.T) {
 	require.False(t, gjson.GetBytes(result.Payload, "conversationState.agentContinuationId").Exists())
 }
 
+func TestBuildKiroPayloadNormalizesClaudeCodeBillingCacheHash(t *testing.T) {
+	build := func(cacheHash string) []byte {
+		body := []byte(fmt.Sprintf(`{
+			"model":"claude-sonnet-4-5",
+			"system":"x-anthropic-billing-header: cc_version=2.1.220; cch=%s;\nProject prompt",
+			"messages":[{"role":"user","content":"hello"}]
+		}`, cacheHash))
+		result, err := BuildKiroPayloadWithContext(body, "claude-sonnet-4.5", "", "AI_EDITOR", nil)
+		require.NoError(t, err)
+		return result.Payload
+	}
+
+	first := build("first-random-value")
+	second := build("second-random-value")
+	firstSystem := gjson.GetBytes(first, "conversationState.history.0.userInputMessage.content").String()
+	require.Contains(t, firstSystem, "cch=0;")
+	require.NotContains(t, firstSystem, "first-random-value")
+	require.Equal(t, stripKiroConversationIDForTest(t, first), stripKiroConversationIDForTest(t, second))
+}
+
 func stripKiroConversationIDForTest(t *testing.T, payloadBytes []byte) []byte {
 	t.Helper()
 	var payload map[string]any

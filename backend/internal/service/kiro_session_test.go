@@ -22,12 +22,26 @@ func TestBuildKiroPayloadForAccountUsesStableConversationIDs(t *testing.T) {
 
 	firstConversationID := gjson.GetBytes(first.Payload, "conversationState.conversationId").String()
 	secondConversationID := gjson.GetBytes(second.Payload, "conversationState.conversationId").String()
+	firstContinuationID := gjson.GetBytes(first.Payload, "conversationState.agentContinuationId").String()
+	secondContinuationID := gjson.GetBytes(second.Payload, "conversationState.agentContinuationId").String()
 	require.NotEmpty(t, firstConversationID)
 	require.NotEmpty(t, secondConversationID)
 	require.Equal(t, firstConversationID, secondConversationID)
 	require.NotEqual(t, "client-conv", firstConversationID)
-	require.False(t, gjson.GetBytes(first.Payload, "conversationState.agentContinuationId").Exists())
-	require.False(t, gjson.GetBytes(second.Payload, "conversationState.agentContinuationId").Exists())
+	require.NotEmpty(t, firstContinuationID)
+	require.Equal(t, firstContinuationID, secondContinuationID)
+	require.NotEqual(t, firstConversationID, firstContinuationID)
+}
+
+func TestBuildKiroPayloadForAccountCanDisableStableAgentContinuationID(t *testing.T) {
+	t.Setenv("SUB2API_KIRO_AGENT_CONTINUATION_ID_MODE", "off")
+	svc := &GatewayService{}
+	account := &Account{ID: 40, Credentials: map[string]any{"profile_arn": "profile-a"}}
+	body := []byte(`{"model":"claude-sonnet-4-5","messages":[{"role":"user","content":"hello"}]}`)
+
+	result, err := svc.buildKiroPayloadForAccount(context.Background(), account, nil, body, "claude-sonnet-4.5", "token", "claude-sonnet-4-5", nil)
+	require.NoError(t, err)
+	require.False(t, gjson.GetBytes(result.Payload, "conversationState.agentContinuationId").Exists())
 }
 
 func TestBuildKiroPayloadForAccountReplaysFullMessagesIntoHistory(t *testing.T) {

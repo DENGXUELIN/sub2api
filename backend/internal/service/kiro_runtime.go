@@ -604,6 +604,11 @@ func (s *GatewayService) buildKiroPayloadForAccountWithArn(ctx context.Context, 
 		if next, setErr := sjson.SetBytes(buildResult.Payload, "conversationState.conversationId", stableID); setErr == nil {
 			buildResult.Payload = next
 		}
+		if continuationID := stableKiroAgentContinuationID(stableID); continuationID != "" {
+			if next, setErr := sjson.SetBytes(buildResult.Payload, "conversationState.agentContinuationId", continuationID); setErr == nil {
+				buildResult.Payload = next
+			}
+		}
 	}
 	return buildResult, nil
 }
@@ -618,6 +623,18 @@ func stableKiroConversationID(account *Account, parsed *ParsedRequest, anthropic
 		return ""
 	}
 	return generateSessionUUID(seed)
+}
+
+func stableKiroAgentContinuationID(conversationID string) string {
+	switch strings.ToLower(strings.TrimSpace(os.Getenv("SUB2API_KIRO_AGENT_CONTINUATION_ID_MODE"))) {
+	case "off", "false", "0", "none":
+		return ""
+	}
+	conversationID = strings.TrimSpace(conversationID)
+	if conversationID == "" {
+		return ""
+	}
+	return generateSessionUUID("kiro-agent-continuation-v1|" + conversationID)
 }
 
 func stableKiroConversationSeed(account *Account, parsed *ParsedRequest, anthropicBody []byte, modelID, profileArn string) string {
@@ -672,6 +689,7 @@ func logKiroStatelessReplay(account *Account, payload []byte) {
 		return
 	}
 	conversationID := gjson.GetBytes(payload, "conversationState.conversationId").String()
+	continuationID := gjson.GetBytes(payload, "conversationState.agentContinuationId").String()
 	systemPrompt := gjson.GetBytes(payload, "conversationState.history.0.userInputMessage.content").String()
 	currentContent := gjson.GetBytes(payload, "conversationState.currentMessage.userInputMessage.content").String()
 	logger.L().Info("kiro.stateless_replay",
@@ -680,6 +698,7 @@ func logKiroStatelessReplay(account *Account, payload []byte) {
 		zap.Int("history_count", len(gjson.GetBytes(payload, "conversationState.history").Array())),
 		zap.Bool("has_agent_continuation_id", gjson.GetBytes(payload, "conversationState.agentContinuationId").Exists()),
 		zap.String("conversation_id_hash", hashKiroLogString(conversationID)),
+		zap.String("agent_continuation_id_hash", hashKiroLogString(continuationID)),
 		zap.String("payload_hash_no_conversation_id", hashKiroPayloadWithoutConversationID(payload)),
 		zap.String("system_prompt_hash", hashKiroLogString(systemPrompt)),
 		zap.Int("system_prompt_len", len(systemPrompt)),
