@@ -792,7 +792,6 @@ var ProviderSet = wire.NewSet(
 	NewUsageCache,
 	NewTotpService,
 	NewErrorPassthroughService,
-	NewPromptRuleService,
 	NewTLSFingerprintProfileService,
 	NewDigestSessionStore,
 	ProvideIdempotencyCoordinator,

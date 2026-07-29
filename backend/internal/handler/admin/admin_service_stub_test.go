@@ -293,10 +293,6 @@ func (s *stubAdminService) GetGroupModelsListCandidates(ctx context.Context, id 
 	return []string{"claude-sonnet-4-6"}, nil
 }
 
-func (s *stubAdminService) GetGroupEffectiveModels(ctx context.Context, id int64) ([]string, error) {
-	return []string{"claude-sonnet-4-6"}, nil
-}
-
 func (s *stubAdminService) ListCompositeRoutes(ctx context.Context, groupID int64) ([]service.CompositeModelRoute, error) {
 	return []service.CompositeModelRoute{
 		{
