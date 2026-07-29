@@ -420,7 +420,7 @@ func BuildKiroPayloadWithContext(claudeBody []byte, modelID, profileArn, origin 
 			baseSystem = inlineSystem
 		}
 	}
-	baseSystem = normalizeKiroBillingHeader(baseSystem)
+	baseSystem = NormalizeBillingHeader(baseSystem)
 	systemPrompt := buildInjectedSystemPrompt(baseSystem, thinking, toolChoiceHint)
 
 	history, currentUserMsg, currentToolResults := processMessages(filteredMessages, modelID, normalizeOrigin(origin), &requestCtx)
@@ -1292,10 +1292,10 @@ func extractSystemPrompt(claudeBody []byte) string {
 	return extractTextFromContentBlocks(gjson.GetBytes(claudeBody, "system"))
 }
 
-// normalizeKiroBillingHeader removes the per-request Claude Code cache hash.
+// NormalizeBillingHeader removes the per-request Claude Code cache hash.
 // Kiro does not consume this billing field, but its changing value invalidates
 // an otherwise identical upstream prompt prefix.
-func normalizeKiroBillingHeader(content string) string {
+func NormalizeBillingHeader(content string) string {
 	const (
 		headerMarker = "x-anthropic-billing-header"
 		cacheMarker  = "cch="

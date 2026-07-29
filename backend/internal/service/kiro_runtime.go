@@ -609,6 +609,24 @@ func (s *GatewayService) buildKiroPayloadForAccountWithArn(ctx context.Context, 
 				buildResult.Payload = next
 			}
 		}
+		var freezeResult kiroSystemPromptFreezeResult
+		buildResult.Payload, freezeResult = freezeKiroSystemPromptHistory(stableID, anthropicBody, buildResult.Payload)
+		if freezeResult.CacheKeyHash != "" {
+			var accountID int64
+			if account != nil {
+				accountID = account.ID
+			}
+			logger.L().Info("kiro.system_prompt_cache",
+				zap.Int64("selected_account_id", accountID),
+				zap.String("cache_key_hash", freezeResult.CacheKeyHash),
+				zap.Bool("cache_hit", freezeResult.Hit),
+				zap.Bool("prompt_reused", freezeResult.Reused),
+				zap.String("incoming_prompt_hash", freezeResult.IncomingHash),
+				zap.String("frozen_prompt_hash", freezeResult.FrozenHash),
+				zap.Int("incoming_prompt_len", freezeResult.IncomingLen),
+				zap.Int("frozen_prompt_len", freezeResult.FrozenLen),
+			)
+		}
 	}
 	return buildResult, nil
 }
