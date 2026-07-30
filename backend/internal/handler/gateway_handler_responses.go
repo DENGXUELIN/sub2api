@@ -59,6 +59,18 @@ func (h *GatewayHandler) Responses(c *gin.Context) {
 		return
 	}
 
+	kiroRemoteCompaction := apiKey.Group != nil && apiKey.Group.Platform == service.PlatformKiro &&
+		service.IsOpenAIRemoteCompactionV2Request(body, c.GetHeader("x-codex-beta-features"))
+	if kiroRemoteCompaction {
+		service.MarkOpenAICompactClientStream(c)
+		keepaliveInterval := time.Duration(0)
+		if h.cfg != nil && h.cfg.Gateway.StreamKeepaliveInterval > 0 {
+			keepaliveInterval = time.Duration(h.cfg.Gateway.StreamKeepaliveInterval) * time.Second
+		}
+		stopCompactKeepalive := service.StartOpenAICompactSSEKeepalive(c, keepaliveInterval)
+		defer stopCompactKeepalive()
+	}
+
 	setOpsRequestContext(c, "", false)
 
 	// Validate JSON
@@ -225,7 +237,7 @@ func (h *GatewayHandler) Responses(c *gin.Context) {
 		accountReleaseFunc = wrapReleaseOnDone(c.Request.Context(), accountReleaseFunc)
 
 		// 5. Forward request
-		writerSizeBeforeForward := c.Writer.Size()
+		writerSizeBeforeForward := service.OpenAICompactKeepaliveAdjustedWrittenSize(c)
 		forwardBody := body
 		if channelMapping.Mapped {
 			forwardBody = h.gatewayService.ReplaceModelInBody(body, channelMapping.MappedModel)
@@ -254,7 +266,7 @@ func (h *GatewayHandler) Responses(c *gin.Context) {
 			var failoverErr *service.UpstreamFailoverError
 			if errors.As(err, &failoverErr) {
 				// Can't failover if streaming content already sent
-				if c.Writer.Size() != writerSizeBeforeForward {
+				if service.OpenAICompactKeepaliveAdjustedWrittenSize(c) != writerSizeBeforeForward {
 					h.handleResponsesFailoverExhausted(c, failoverErr, true)
 					return
 				}

@@ -36,6 +36,14 @@ func (s *GatewayService) ForwardAsResponses(
 	parsed *ParsedRequest,
 ) (*ForwardResult, error) {
 	startTime := time.Now()
+	kiroRemoteCompaction := account != nil && account.Platform == PlatformKiro && isKiroRemoteCompactionV2Request(c, body)
+	if account != nil && account.Platform == PlatformKiro {
+		preparedBody, prepareErr := s.prepareKiroResponsesBody(body, kiroRemoteCompaction)
+		if prepareErr != nil {
+			return nil, prepareErr
+		}
+		body = preparedBody
+	}
 
 	// 1. Lower Codex client-side tools to function tools understood by Anthropic.
 	adaptedBody, clientToolMapping, err := adaptResponsesClientToolsForAnthropic(body)
@@ -214,7 +222,9 @@ func (s *GatewayService) ForwardAsResponses(
 	// 13. Handle normal response (convert Anthropic → Responses)
 	var result *ForwardResult
 	var handleErr error
-	if clientStream {
+	if kiroRemoteCompaction {
+		result, handleErr = s.handleKiroResponsesCompactStreamingResponse(resp, c, originalModel, mappedModel, startTime)
+	} else if clientStream {
 		result, handleErr = s.handleResponsesStreamingResponse(resp, c, originalModel, mappedModel, reasoningEffort, startTime, clientToolMapping)
 	} else {
 		result, handleErr = s.handleResponsesBufferedStreamingResponse(resp, c, originalModel, mappedModel, reasoningEffort, startTime, clientToolMapping)
