@@ -378,12 +378,12 @@ func TestBuildKiroPayloadAddsAdditionalModelRequestFieldsForOutputConfigModels(t
 		{
 			name: "adaptive effort",
 			body: []byte(`{
-				"model":"claude-opus-4-9",
+				"model":"claude-fable-5",
 				"thinking":{"type":"adaptive","effort":"medium"},
 				"output_config":{"effort":"medium"},
 				"messages":[{"role":"user","content":"hello kiro"}]
 			}`),
-			modelID:    "claude-opus-4.9",
+			modelID:    "claude-fable-5",
 			wantEffort: "medium",
 		},
 		{
@@ -411,6 +411,20 @@ func TestBuildKiroPayloadAddsAdditionalModelRequestFieldsForOutputConfigModels(t
 	}
 }
 
+func TestBuildKiroPayloadPreservesGPT56ModelIDWithoutClaudeReasoningFields(t *testing.T) {
+	body := []byte(`{
+		"model":"gpt-5.6-sol",
+		"thinking":{"type":"adaptive"},
+		"output_config":{"effort":"high"},
+		"messages":[{"role":"user","content":"hello kiro"}]
+	}`)
+
+	result, err := BuildKiroPayloadWithContext(body, MapModel("gpt-5.6-sol"), "", "AI_EDITOR", nil)
+	require.NoError(t, err)
+	require.Equal(t, "gpt-5.6-sol", gjson.GetBytes(result.Payload, "conversationState.currentMessage.userInputMessage.modelId").String())
+	require.False(t, gjson.GetBytes(result.Payload, "additionalModelRequestFields").Exists())
+}
+
 func TestBuildKiroPayloadSkipsAdditionalModelRequestFieldsForLegacyThinkingModel(t *testing.T) {
 	body := []byte(`{
 		"model":"claude-sonnet-4-5-20250929-thinking",
@@ -419,6 +433,15 @@ func TestBuildKiroPayloadSkipsAdditionalModelRequestFieldsForLegacyThinkingModel
 	}`)
 
 	result, err := BuildKiroPayloadWithContext(body, "claude-sonnet-4.5", "", "AI_EDITOR", nil)
+	require.NoError(t, err)
+	require.False(t, gjson.GetBytes(result.Payload, "additionalModelRequestFields").Exists())
+
+	sonnet48Body := []byte(`{
+		"model":"claude-sonnet-4-8-thinking",
+		"thinking":{"type":"adaptive","effort":"high"},
+		"messages":[{"role":"user","content":"hello kiro"}]
+	}`)
+	result, err = BuildKiroPayloadWithContext(sonnet48Body, "claude-sonnet-4.8", "", "AI_EDITOR", nil)
 	require.NoError(t, err)
 	require.False(t, gjson.GetBytes(result.Payload, "additionalModelRequestFields").Exists())
 }
@@ -2553,6 +2576,11 @@ func TestMapModel_MatchesKiroReferenceMapping(t *testing.T) {
 	t.Parallel()
 
 	cases := map[string]string{
+		"gpt-5.6-sol":                         "gpt-5.6-sol",
+		" GPT-5.6-TERRA ":                     "gpt-5.6-terra",
+		"gpt-5.6-luna":                        "gpt-5.6-luna",
+		"claude-fable-5":                      "claude-fable-5",
+		"claude-fable-5-thinking":             "claude-fable-5",
 		"claude-opus-5":                       "claude-opus-5",
 		"claude-opus-4-8":                     "claude-opus-4.8",
 		"claude-opus-4-8-thinking":            "claude-opus-4.8",
@@ -2565,6 +2593,9 @@ func TestMapModel_MatchesKiroReferenceMapping(t *testing.T) {
 		"claude-sonnet-4.6":                   "claude-sonnet-4.6",
 		"claude-sonnet-5":                     "claude-sonnet-5",
 		"claude-sonnet-5-thinking":            "claude-sonnet-5",
+		"claude-sonnet-4-8":                   "claude-sonnet-4.8",
+		"claude-sonnet-4-8-thinking":          "claude-sonnet-4.8",
+		"claude-sonnet-4.8":                   "claude-sonnet-4.8",
 		"claude-opus-4-9":                     "claude-opus-4.9",
 		"claude-opus-4-9-thinking":            "claude-opus-4.9",
 		"claude-sonnet-5-0-thinking":          "claude-sonnet-5.0",
@@ -2607,16 +2638,21 @@ func TestMapModel_MatchesKiroReferenceMapping(t *testing.T) {
 	}
 }
 
-func TestIsOutputConfigPathModelSupportsFutureVersions(t *testing.T) {
+func TestIsOutputConfigPathModelMatchesKiroReasoningCapabilities(t *testing.T) {
 	t.Parallel()
 
 	cases := map[string]bool{
-		"claude-opus-4.6":            true,
-		"claude-opus-4-9-thinking":   true,
-		"claude-sonnet-5-0-thinking": true,
-		"claude-haiku-4.5":           false,
-		"claude-opus-4-5":            false,
-		"gpt-4o":                     false,
+		"claude-opus-4.6":          true,
+		"claude-opus-4-8-thinking": true,
+		"claude-sonnet-4.6":        true,
+		"claude-fable-5-thinking":  true,
+		"claude-sonnet-5":          true,
+		"claude-sonnet-4.8":        false,
+		"claude-opus-4.9-thinking": false,
+		"claude-haiku-4.5":         false,
+		"claude-opus-4-5":          false,
+		"gpt-5.6-sol":              false,
+		"gpt-4o":                   false,
 	}
 
 	for modelID, want := range cases {

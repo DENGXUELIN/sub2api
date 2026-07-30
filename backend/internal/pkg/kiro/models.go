@@ -8,6 +8,11 @@ type Model struct {
 }
 
 var DefaultModels = []Model{
+	{ID: "gpt-5.6-sol", Type: "model", DisplayName: "GPT 5.6 Sol"},
+	{ID: "gpt-5.6-terra", Type: "model", DisplayName: "GPT 5.6 Terra"},
+	{ID: "gpt-5.6-luna", Type: "model", DisplayName: "GPT 5.6 Luna"},
+	{ID: "claude-fable-5", Type: "model", DisplayName: "Claude Fable 5"},
+	{ID: "claude-fable-5-thinking", Type: "model", DisplayName: "Claude Fable 5 (Thinking)"},
 	{ID: "claude-opus-5", Type: "model", DisplayName: "Claude Opus 5"},
 	{ID: "claude-opus-4-8", Type: "model", DisplayName: "Claude Opus 4.8"},
 	{ID: "claude-opus-4-8-thinking", Type: "model", DisplayName: "Claude Opus 4.8 (Thinking)"},
@@ -17,6 +22,8 @@ var DefaultModels = []Model{
 	{ID: "claude-opus-4-6-thinking", Type: "model", DisplayName: "Claude Opus 4.6 (Thinking)"},
 	{ID: "claude-sonnet-5", Type: "model", DisplayName: "Claude Sonnet 5"},
 	{ID: "claude-sonnet-5-thinking", Type: "model", DisplayName: "Claude Sonnet 5 (Thinking)"},
+	{ID: "claude-sonnet-4-8", Type: "model", DisplayName: "Claude Sonnet 4.8"},
+	{ID: "claude-sonnet-4-8-thinking", Type: "model", DisplayName: "Claude Sonnet 4.8 (Thinking)"},
 	{ID: "claude-sonnet-4-6", Type: "model", DisplayName: "Claude Sonnet 4.6"},
 	{ID: "claude-sonnet-4-6-thinking", Type: "model", DisplayName: "Claude Sonnet 4.6 (Thinking)"},
 	{ID: "claude-opus-4-5-20251101", Type: "model", DisplayName: "Claude Opus 4.5"},

@@ -250,6 +250,10 @@ type kiroSemanticEvent struct {
 
 func MapModel(model string) string {
 	switch strings.TrimSpace(strings.ToLower(model)) {
+	case "gpt-5.6-sol", "gpt-5.6-terra", "gpt-5.6-luna":
+		return strings.TrimSpace(strings.ToLower(model))
+	case "claude-fable-5", "claude-fable-5-thinking":
+		return "claude-fable-5"
 	case "claude-opus-5":
 		return "claude-opus-5"
 	case "claude-opus-4-8", "claude-opus-4-8-thinking", "claude-opus-4.8":
@@ -260,6 +264,8 @@ func MapModel(model string) string {
 		return "claude-opus-4.6"
 	case "claude-sonnet-5", "claude-sonnet-5-thinking":
 		return "claude-sonnet-5"
+	case "claude-sonnet-4-8", "claude-sonnet-4-8-thinking", "claude-sonnet-4.8":
+		return "claude-sonnet-4.8"
 	case "claude-sonnet-4-6", "claude-sonnet-4-6-thinking", "claude-sonnet-4.6":
 		return "claude-sonnet-4.6"
 	case "claude-opus-4-5-20251101", "claude-opus-4-5-20251101-thinking", "claude-opus-4.5":
@@ -286,10 +292,6 @@ func MapModel(model string) string {
 // 例如：claude-opus-4-9 → claude-opus-4.9, claude-opus-4-9-thinking → claude-opus-4.9
 var claudeVersionNormalizePattern = regexp.MustCompile(
 	`^(claude-(?:sonnet|haiku|opus))-(\d+)-(\d{1,2})(?:-thinking)?$`,
-)
-
-var claudeDottedVersionPattern = regexp.MustCompile(
-	`^(claude-(?:sonnet|haiku|opus))-(\d+)\.(\d{1,2})(?:-thinking)?$`,
 )
 
 func normalizeClaudeVersionNumber(model string) string {
@@ -1539,27 +1541,17 @@ func buildAdditionalModelRequestFields(thinking *thinkingDirective, modelID stri
 	return nil
 }
 
-// isOutputConfigPathModel 判断模型是否使用 output_config 路径（Claude 4.6+）。
-// 这是基于已知模型列表的静态判断，未来可改为动态从 ListAvailableModels 发现。
+// isOutputConfigPathModel reports whether Kiro accepts output_config for the model.
+// Keep this conservative: sending the field to unsupported models causes an upstream 400.
 func isOutputConfigPathModel(modelID string) bool {
-	normalized := normalizeClaudeVersionNumber(strings.ToLower(strings.TrimSpace(modelID)))
-	// Claude 4.6+ 所有模型使用 output_config 路径
-	for _, prefix := range []string{"claude-opus-4.6", "claude-opus-4.7", "claude-opus-4.8",
-		"claude-sonnet-5", "claude-sonnet-4.6", "claude-sonnet-4.7", "claude-sonnet-4.8",
-		"claude-haiku-4.6", "claude-haiku-4.7", "claude-haiku-4.8"} {
-		if normalized == prefix || strings.HasPrefix(normalized, prefix+"-") || strings.HasPrefix(normalized, prefix+".") {
-			return true
-		}
+	normalized := normalizeModelAlias(normalizeClaudeVersionNumber(strings.ToLower(strings.TrimSpace(modelID))))
+	switch normalized {
+	case "claude-opus-4.6", "claude-opus-4.7", "claude-opus-4.8",
+		"claude-sonnet-4.6", "claude-fable-5", "claude-sonnet-5", "claude-opus-5":
+		return true
+	default:
+		return false
 	}
-	// 通用兜底：版本号 >= 4.6 的 Claude 模型（处理未来新版本）
-	if matches := claudeDottedVersionPattern.FindStringSubmatch(normalized); matches != nil {
-		major, _ := strconv.Atoi(matches[2])
-		minor, _ := strconv.Atoi(matches[3])
-		if major > 4 || (major == 4 && minor >= 6) {
-			return true
-		}
-	}
-	return false
 }
 
 // budgetToEffort 将 thinking budget_tokens 粗略映射为 effort 等级。

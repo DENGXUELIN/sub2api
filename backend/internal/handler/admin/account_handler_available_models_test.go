@@ -323,6 +323,11 @@ func TestAccountHandlerGetAvailableModels_KiroOAuthFallsBackToDefaults(t *testin
 	require.True(t, slices.Contains(ids, "claude-opus-4-7"))
 	require.True(t, slices.Contains(ids, "claude-opus-4-6"))
 	require.True(t, slices.Contains(ids, "claude-sonnet-4-6"))
+	require.True(t, slices.Contains(ids, "gpt-5.6-sol"))
+	require.True(t, slices.Contains(ids, "gpt-5.6-terra"))
+	require.True(t, slices.Contains(ids, "gpt-5.6-luna"))
+	require.True(t, slices.Contains(ids, "claude-fable-5"))
+	require.True(t, slices.Contains(ids, "claude-sonnet-4-8"))
 	require.False(t, slices.Contains(ids, "kiro-claude-opus-4-7"))
 	require.False(t, slices.Contains(ids, "gpt-4o"))
 }
@@ -443,6 +448,9 @@ func TestAccountHandlerGetAvailableModels_KiroAPIKeyWithoutMappingFallsBackToDef
 	}
 	require.True(t, slices.Contains(ids, "claude-opus-4-7"))
 	require.True(t, slices.Contains(ids, "claude-opus-4-6"))
+	require.True(t, slices.Contains(ids, "gpt-5.6-sol"))
+	require.True(t, slices.Contains(ids, "claude-fable-5"))
+	require.True(t, slices.Contains(ids, "claude-sonnet-4-8"))
 	require.False(t, slices.Contains(ids, "kiro-claude-opus-4-7"))
 }
 

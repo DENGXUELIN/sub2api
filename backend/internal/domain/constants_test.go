@@ -32,6 +32,11 @@ func TestDefaultKiroModelMapping_MatchesKiroReferenceModels(t *testing.T) {
 	t.Parallel()
 
 	expected := map[string]string{
+		"gpt-5.6-sol":                         "gpt-5.6-sol",
+		"gpt-5.6-terra":                       "gpt-5.6-terra",
+		"gpt-5.6-luna":                        "gpt-5.6-luna",
+		"claude-fable-5":                      "claude-fable-5",
+		"claude-fable-5-thinking":             "claude-fable-5",
 		"claude-opus-5":                       "claude-opus-5",
 		"claude-opus-4-8":                     "claude-opus-4.8",
 		"claude-opus-4-8-thinking":            "claude-opus-4.8",
@@ -41,6 +46,8 @@ func TestDefaultKiroModelMapping_MatchesKiroReferenceModels(t *testing.T) {
 		"claude-opus-4-6-thinking":            "claude-opus-4.6",
 		"claude-sonnet-5":                     "claude-sonnet-5",
 		"claude-sonnet-5-thinking":            "claude-sonnet-5",
+		"claude-sonnet-4-8":                   "claude-sonnet-4.8",
+		"claude-sonnet-4-8-thinking":          "claude-sonnet-4.8",
 		"claude-sonnet-4-6":                   "claude-sonnet-4.6",
 		"claude-sonnet-4-6-thinking":          "claude-sonnet-4.6",
 		"claude-opus-4-5-20251101":            "claude-opus-4.5",

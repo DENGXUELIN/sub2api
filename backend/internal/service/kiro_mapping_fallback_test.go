@@ -11,6 +11,12 @@ import (
 func TestAccountKiroDefaultMappingRestrictsUnsupportedModels(t *testing.T) {
 	account := &Account{Platform: PlatformKiro}
 
+	require.True(t, account.IsModelSupported("gpt-5.6-sol"))
+	require.True(t, account.IsModelSupported("gpt-5.6-terra"))
+	require.True(t, account.IsModelSupported("gpt-5.6-luna"))
+	require.Equal(t, "gpt-5.6-sol", account.GetMappedModel("gpt-5.6-sol"))
+	require.Equal(t, "claude-fable-5", account.GetMappedModel("claude-fable-5-thinking"))
+	require.Equal(t, "claude-sonnet-4.8", account.GetMappedModel("claude-sonnet-4-8-thinking"))
 	require.False(t, account.IsModelSupported("gpt-4o"))
 	require.False(t, account.IsModelSupported("kiro-gpt-4o"))
 	require.False(t, account.IsModelSupported("auto"))
