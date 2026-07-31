@@ -79,6 +79,22 @@ func (s *GatewayService) forwardKiroMessages(ctx context.Context, c *gin.Context
 	if mappedModel != originalModel {
 		body = s.replaceModelInBody(body, mappedModel)
 	}
+	guardedBody, guardResult, guardErr := applyKiroContextGuard(ctx, body)
+	if guardErr != nil {
+		return nil, guardErr
+	}
+	if guardResult.Applied {
+		body = guardedBody
+		logger.L().Warn("kiro.context_guard_applied",
+			zap.Int64("account_id", account.ID),
+			zap.String("model", mappedModel),
+			zap.Int("tokens_before", guardResult.TokensBefore),
+			zap.Int("tokens_after", guardResult.TokensAfter),
+			zap.Int("messages_before", guardResult.MessagesBefore),
+			zap.Int("messages_after", guardResult.MessagesAfter),
+			zap.Int("messages_folded", guardResult.MessagesFolded),
+		)
+	}
 	logger.L().Debug("gateway forward_kiro_messages: request prepared",
 		zap.Int64("account_id", account.ID),
 		zap.String("auth_method", strings.TrimSpace(account.GetCredential("auth_method"))),
