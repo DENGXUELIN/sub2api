@@ -55,6 +55,8 @@ func TestNormalizeOpenAIResponsesCompactRequest_RemoteV2StaysOnResponses(t *test
 	require.True(t, streamOK)
 	require.True(t, reqStream)
 
+	_, compactExists := c.Get(service.OpenAICompactRequestKeyForTest())
+	require.True(t, compactExists)
 	_, seedExists := c.Get(service.OpenAICompactSessionSeedKeyForTest())
 	require.False(t, seedExists)
 	_, streamMarkerExists := c.Get(service.OpenAICompactClientStreamKeyForTest())
@@ -179,6 +181,9 @@ func TestNormalizeOpenAIResponsesCompactRequest_PathBasedNoDoubleSuffix(t *testi
 	require.Equal(t, "/v1/responses/compact", c.Request.URL.Path)
 	require.False(t, gjson.GetBytes(normalized, "stream").Exists())
 	require.False(t, gjson.GetBytes(normalized, "store").Exists())
+	marked, exists := c.Get(service.OpenAICompactRequestKeyForTest())
+	require.True(t, exists)
+	require.Equal(t, true, marked)
 }
 
 func TestNormalizeOpenAIResponsesCompactRequest_SubpathNotPromoted(t *testing.T) {

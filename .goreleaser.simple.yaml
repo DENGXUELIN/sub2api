@@ -72,10 +72,10 @@ release:
     name: "{{ .Env.GITHUB_REPO_NAME }}"
   draft: false
   prerelease: auto
-  name_template: "Sub2API {{.Version}} (Simple)"
+  name_template: "Sub2API {{.Version}}"
   header: |
     > AI API Gateway Platform - 将 AI 订阅配额分发和管理
-    > ⚡ Simple Release: x86_64 GHCR 镜像和 Linux x86_64 更新包
+    > 提供 x86_64 GHCR 镜像和 Linux x86_64 更新包
 
     {{ .Env.TAG_MESSAGE }}
 

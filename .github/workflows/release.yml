@@ -157,6 +157,9 @@ jobs:
 
           # 获取完整的 tag message（跳过第一行标题）
           TAG_MESSAGE=$(git tag -l --format='%(contents:body)' "$TAG_NAME")
+          if [ -z "$(printf '%s' "$TAG_MESSAGE" | tr -d '[:space:]')" ]; then
+            TAG_MESSAGE=$(git tag -l --format='%(contents:subject)' "$TAG_NAME")
+          fi
 
           # 调试输出
           echo "Tag message length: ${#TAG_MESSAGE}"

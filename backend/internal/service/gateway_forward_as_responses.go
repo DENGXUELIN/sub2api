@@ -36,8 +36,12 @@ func (s *GatewayService) ForwardAsResponses(
 	parsed *ParsedRequest,
 ) (*ForwardResult, error) {
 	startTime := time.Now()
-	kiroRemoteCompaction := account != nil && account.Platform == PlatformKiro && isKiroRemoteCompactionV2Request(c, body)
-	if account != nil && account.Platform == PlatformKiro {
+	kiroNativeRemoteCompaction := account != nil && account.Platform == PlatformKiro && isKiroRemoteCompactionV2Request(c, body)
+	kiroRemoteCompaction := account != nil && account.Platform == PlatformKiro && (kiroNativeRemoteCompaction || IsOpenAICompactRequest(c))
+	if kiroNativeRemoteCompaction {
+		MarkOpenAICompactClientStream(c)
+	}
+	if account != nil && account.Platform == PlatformKiro && shouldPrepareKiroResponsesBody(body, kiroRemoteCompaction) {
 		preparedBody, prepareErr := s.prepareKiroResponsesBody(body, kiroRemoteCompaction)
 		if prepareErr != nil {
 			return nil, prepareErr

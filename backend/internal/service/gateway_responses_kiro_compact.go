@@ -33,15 +33,25 @@ func isKiroRemoteCompactionV2Request(c *gin.Context, body []byte) bool {
 }
 
 func IsOpenAIRemoteCompactionV2Request(body []byte, betaFeatures string) bool {
-	if !gjson.GetBytes(body, "stream").Bool() || !HasCompactionTriggerInInput(body) {
-		return false
-	}
+	featureEnabled := false
 	for _, feature := range strings.Split(betaFeatures, ",") {
 		if strings.TrimSpace(feature) == "remote_compaction_v2" {
-			return true
+			featureEnabled = true
+			break
 		}
 	}
-	return false
+	if !featureEnabled || !bytes.Contains(body, []byte("compaction_trigger")) {
+		return false
+	}
+	return gjson.GetBytes(body, "stream").Bool() && HasCompactionTriggerInInput(body)
+}
+
+func hasKiroCompactionPayload(body []byte) bool {
+	return bytes.Contains(body, []byte(kiroCompactionPayloadPrefix))
+}
+
+func shouldPrepareKiroResponsesBody(body []byte, compact bool) bool {
+	return compact || hasKiroCompactionPayload(body)
 }
 
 func (s *GatewayService) prepareKiroResponsesBody(body []byte, compact bool) ([]byte, error) {
@@ -302,7 +312,6 @@ func (s *GatewayService) handleKiroResponsesCompactStreamingResponse(
 		return nil, fmt.Errorf("encode Kiro compact response: %w", err)
 	}
 
-	MarkOpenAICompactClientStream(c)
 	if !writeOpenAICompactSSEBridge(c, http.StatusOK, encodedResponse) {
 		c.Data(http.StatusOK, "application/json; charset=utf-8", encodedResponse)
 	}
